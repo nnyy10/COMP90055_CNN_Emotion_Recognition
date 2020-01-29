@@ -6,6 +6,7 @@ from mtcnn import MTCNN
 import pycm
 import numbers
 import imblearn
+from collections import Counter
 
 
 def detect_faces(image):
@@ -85,6 +86,17 @@ def print_confusion_matrix(y_predicted, y_actual):
         print("invalid input")
 
 
-def down_sample(x, y):
-    undersampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy="not minority", random_state=0)
-    return undersampler.fit_resample(x, y)
+def get_class_num(y_list):
+    result = Counter(y_list)
+    class_counter = [result[x] for x in range(7)]
+    return np.asarray(class_counter)
+
+
+def under_sample(x, y):
+    under_sampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy="not minority", random_state=42)
+    return under_sampler.fit_resample(x, y)
+
+
+def up_sample_smote(x, y):
+    sm = imblearn.over_sampling.SMOTE(random_state=42)
+    return sm.fit_resample(x, y)
