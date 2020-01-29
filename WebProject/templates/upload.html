@@ -1,0 +1,26 @@
+{%extends "base.html"%}
+
+<title>Upload Image</title>
+
+{%block main%}
+
+<div class="container">
+  <div class="row">
+    <div class = "col">
+      <h3>Select Image </h3>
+        <hr>
+
+        <form method="post" role="form" enctype="multipart/form-data">
+            <input id="input1" name="input1" type="file" class="file">
+        </form>
+
+        <hr>
+        <h3>Result</h3>
+        {{ result }}
+
+    </div>
+  </div>
+
+</div>
+
+{%endblock main%}
