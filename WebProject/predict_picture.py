@@ -33,7 +33,7 @@ def predict(image):
 
     # with graph.as_default():
     print('making predictions...')
-    model = load_model('best_model.h5')
+    model = load_model('model/best_model.h5')
     predictions = model.predict(processed_faces)
     K.clear_session()
     print('done \n')
