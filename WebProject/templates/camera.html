@@ -4,11 +4,60 @@
 
 {%block main%}
 
+<style>
+    video{
+        width: 50%;
+        height: 50%;
+        margin: 50px auto;
+        background-color: aquamarine;
+        display: block;
+    }
+</style>
+
 <div class="container">
   <div class="row">
     <div class = "col">
       <h3>Real-time Prediction</h3>
-        <hr>
+{#        <hr>#}
+
+        <video id="video"></video>
+{#        <video id="video" autoplay style="width: 50%;height: 50%"></video>#}
+
+        <script>
+            var video = document.getElementById('video');
+
+
+            if (navigator.mediaDevices.getUserMedia) {
+                //The newest API
+                navigator.mediaDevices.getUserMedia({video : {width: 1000, height: 1000}}).then(success).catch(error);
+            } else if (navigator.webkitGetUserMedia) {
+                //webkit core browser
+                navigator.webkitGetUserMedia({video : {width: 1000, height: 1000}},success, error)
+            } else if (navigator.mozGetUserMedia) {
+                //firfox browser
+                navigator.mozGetUserMedia({video : {width: 1000, height: 1000}}, success, error);
+            } else if (navigator.getUserMedia) {
+                //Old API
+                navigator.getUserMedia({video : {width: 1000, height: 1000}}, success, error);
+            }
+
+            function success(stream) {
+                //兼容webkit核心浏览器
+                // let CompatibleURL = window.URL || window.webkitURL;
+
+                //将视频流设置为video元素的源
+                console.log(stream);
+
+                //video.src = CompatibleURL.createObjectURL(stream);
+                video.srcObject = stream;
+                video.play();
+            }
+
+            function error(error) {
+                console.log(`Error${error.name}, ${error.message}`);
+            }
+
+        </script>
 
     </div>
   </div>
@@ -16,3 +65,5 @@
 </div>
 
 {%endblock main%}
+
+
