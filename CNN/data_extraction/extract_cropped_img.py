@@ -1,8 +1,9 @@
 import csv
 import numpy as np
-from data_processing import *
+from data_processing import crop_face_single
 from PIL import Image
 import os
+from utils import emotion_int_to_str
 
 
 DATA_DIR = "../data/icml_face_data.csv"

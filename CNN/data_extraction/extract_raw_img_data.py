@@ -1,6 +1,6 @@
 import csv
 import numpy as np
-from data_processing import *
+from utils import emotion_int_to_str
 
 DATA_DIR = "../data/icml_face_data.csv"
 

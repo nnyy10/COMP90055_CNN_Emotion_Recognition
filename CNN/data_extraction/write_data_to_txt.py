@@ -1,9 +1,8 @@
 import csv
 import os
 import cv2
-from utils import detect_faces, getxywh
+from face_detection import detect_faces, getxywh
 import numpy as np
-import shutil
 
 
 base_dir = "C:\\Users\\naiyu\\Documents\\Naiyun"

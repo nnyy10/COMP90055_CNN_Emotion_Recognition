@@ -3,34 +3,50 @@ import keras
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from mtcnn import MTCNN
 import pycm
 import numbers
 import imblearn
 from collections import Counter
 import tensorflow as tf
+from face_detection import getxywh
 
 
-detector = MTCNN()
+def emotion_int_to_str(emotion_int):
+    if emotion_int == 0:
+        return "Angry"
+    elif emotion_int == 1:
+        return "Disgust"
+    elif emotion_int == 2:
+        return "Fear"
+    elif emotion_int == 3:
+        return "Happy"
+    elif emotion_int == 4:
+        return "Sad"
+    elif emotion_int == 5:
+        return "Surprise"
+    elif emotion_int == 6:
+        return "Neutral"
+    else:
+        return None
 
 
-def detect_faces(image):
-    global detector
-    faces = [face["box"] for face in detector.detect_faces(image)]
-    return faces
-
-
-def getxywh(face):
-    return face[0], face[1], face[2], face[3]
-
-
-def display_all_faces(image, faces):
-    for face in faces:
-        box_x, box_y, box_w, box_h = getxywh(face)
-        image = cv2.rectangle(image, (box_x, box_y), (box_x + box_w, box_y + box_h), (255, 0, 0))
-
-    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    plt.show()
+def emotion_str_to_int(emotion_str):
+    if emotion_str.lower() == "angry":
+        return 0
+    elif emotion_str.lower() == "disgust":
+        return 1
+    elif emotion_str.lower() == "fear":
+        return 2
+    elif emotion_str.lower() == "happy":
+        return 3
+    elif emotion_str.lower() == "sad":
+        return 4
+    elif emotion_str.lower() == "surprise":
+        return 5
+    elif emotion_str.lower() == "neutral":
+        return 6
+    else:
+        return None
 
 
 def process_face(image, face):
