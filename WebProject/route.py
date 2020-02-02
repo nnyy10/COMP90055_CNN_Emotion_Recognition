@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, request, redirect, flash, url_for, Flask, config, session, current_app
+from flask import render_template, request, redirect, flash, url_for, session, Response
 from flask_login import login_user
 
 from app import db, app
@@ -158,28 +158,8 @@ def function():
     return render_template('function.html')
 
 
+
+
 @app.route('/camera', methods=['GET', 'POST'])
 def camera():
-    # # 调用笔记本内置摄像头，所以参数为0，如果有其他的摄像头可以调整参数为1，2
-    # cap = cv2.VideoCapture(0)
-    # while True:
-    #     # 从摄像头读取图片
-    #     sucess, frame = cap.read()
-    #     # 转为灰度图片
-    #     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #     # 显示摄像头，背景是灰度。
-    #     cv2.imshow("img", frame)
-    #     # 保持画面的持续。
-    #     k = cv2.waitKey(1)
-    #     if k == 27:
-    #         # 通过esc键退出摄像
-    #         cv2.destroyAllWindows()
-    #         break
-    #     elif k == ord("s"):
-    #         # 通过s键保存图片，并退出。
-    #         cv2.imwrite("image.jpg", frame)
-    #         cv2.destroyAllWindows()
-    #         break
-    # # 关闭摄像头
-    # cap.release()
     return render_template('camera.html')
