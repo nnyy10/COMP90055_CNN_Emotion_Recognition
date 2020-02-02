@@ -29,6 +29,7 @@ y_valid = []
 
 detector = None
 
+
 def process_picture(picture):
     pixel_array = picture.split(' ')
     pixel_array = np.array(list(map(int, pixel_array)), dtype=np.uint8)

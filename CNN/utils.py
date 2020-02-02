@@ -1,5 +1,6 @@
 import cv2
 import keras
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from mtcnn import MTCNN
@@ -7,10 +8,14 @@ import pycm
 import numbers
 import imblearn
 from collections import Counter
+import tensorflow as tf
+
+
+detector = MTCNN()
 
 
 def detect_faces(image):
-    detector = MTCNN()
+    global detector
     faces = [face["box"] for face in detector.detect_faces(image)]
     return faces
 
@@ -92,6 +97,27 @@ def get_class_num(y_list):
     return np.asarray(class_counter)
 
 
+def plot_acc_history(history):
+    # summarize history for accuracy
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+
+def plot_loss_history(history):
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
 def under_sample(x, y):
     under_sampler = imblearn.under_sampling.RandomUnderSampler(sampling_strategy="not minority", random_state=42)
     return under_sampler.fit_resample(x, y)
@@ -100,3 +126,57 @@ def under_sample(x, y):
 def up_sample_smote(x, y):
     sm = imblearn.over_sampling.SMOTE(random_state=42)
     return sm.fit_resample(x, y)
+
+
+def load_data():
+    base_image_path = 'data/processed_data'
+    image_type_path = 'base'
+
+    x_train = np.load(os.path.join(base_image_path, image_type_path, 'x_train.npy'))
+    # x_train_new = []
+    # for x in x_train:
+    #     x_train_new.append(cv2.resize(x, (160, 160)))
+    # x_train = np.array(x_train_new)
+    x_train = np.true_divide(x_train, 255)
+
+    x_test_new = []
+    x_test = np.load(os.path.join(base_image_path, image_type_path, 'x_test.npy'))
+    # for x in x_test:
+    #     x_test_new.append(cv2.resize(x, (160, 160)))
+    # x_test = np.array(x_test_new)
+    x_test = np.true_divide(x_test, 255)
+
+    x_valid_new = []
+    x_valid = np.load(os.path.join(base_image_path, image_type_path, 'x_valid.npy'))
+    # for x in x_valid:
+    #     x_valid_new.append(cv2.resize(x, (160, 160)))
+    # x = np.array(x_valid_new)
+    x_valid = np.true_divide(x_valid, 255)
+
+    y_train = np.load(os.path.join(base_image_path, image_type_path, 'y_train.npy'))
+    y_test = np.load(os.path.join(base_image_path, image_type_path, 'y_test.npy'))
+    y_valid = np.load(os.path.join(base_image_path, image_type_path, 'y_valid.npy'))
+
+    return x_train, y_train, x_valid, y_valid, x_test, y_test
+
+def create_model():
+    model_dir = 'model/keras/model/facenet_keras.h5'
+
+    inception_v1_model = keras.models.load_model(model_dir)
+    cnt = 0
+    for layer in inception_v1_model.layers:
+        if cnt == 200:
+            break
+        layer.trainable = False
+        cnt += 1
+
+
+    model = keras.Sequential()
+
+    model.add(inception_v1_model)
+    model.add(keras.layers.Dense(7, activation='softmax'))
+    print(model.summary())
+
+    model.compile(keras.optimizers.RMSprop(lr=0.00001), metrics=['accuracy'],
+                  loss=tf.keras.losses.categorical_crossentropy)
+    return model
