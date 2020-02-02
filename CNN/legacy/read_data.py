@@ -7,7 +7,7 @@ import mtcnn
 import utils
 import cv2
 
-DATA_DIR = "data/icml_face_data.csv"
+DATA_DIR = "../data/icml_face_data.csv"
 
 TRAIN_LABEL = "Training"
 PUB_TEST_LABEL = "PublicTest"
@@ -106,9 +106,9 @@ y_test = process_y(y_test)
 y_valid = process_y(y_valid)
 print('done \n ')
 
-np.save('data/processed_data/cropped/x_train.npy', x_train)
-np.save('data/processed_data/cropped/x_test.npy', x_test)
-np.save('data/processed_data/cropped/x_valid.npy', x_valid)
+np.save('../data/processed_data/cropped/x_train.npy', x_train)
+np.save('../data/processed_data/cropped/x_test.npy', x_test)
+np.save('../data/processed_data/cropped/x_valid.npy', x_valid)
 np.save('y_train', y_train)
 np.save('y_test', y_test)
 np.save('y_valid', y_valid)

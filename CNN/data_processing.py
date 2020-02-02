@@ -40,3 +40,13 @@ def crop_face_single(pixel_array, resize=True):
         return cv2.resize(crop_img, (x, y))
     else:
         return crop_img
+
+
+def process_face(image, face, size):
+    box_x, box_y, box_w, box_h = getxywh(face)
+    image = image[box_y:box_y + box_h, box_x:box_x + box_w]
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    image = cv2.resize(image, size)
+    image = np.true_divide(image, 255)
+    image = np.stack((image,) * 3, axis=-1)
+    return image
