@@ -3,9 +3,9 @@ from data_processing import process_face
 from face_detection import display_all_faces
 import numpy as np
 import tensorflow as tf
-from utils import get_predicted_emotion
+from utils import get_predicted_emotion, get_predicted_emotion_dictionary
 
-model = tf.keras.models.load_model("mode_v1.h5")
+model = tf.keras.models.load_model("model/keras/model/mode_v1.h5")
 
 
 def predict(image):
@@ -27,12 +27,18 @@ def predict(image):
     # display_all_faces(image, faces)
 
     print('processing faces...')
-    processed_faces = np.array([process_face(image, face, size=(160, 160)) for face in faces])
+    processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]
+    cropped_face = np.array([pair[0] for pair in processed_faces_pair])
+    processed_faces = np.array([pair[1] for pair in processed_faces_pair])
     print('done \n')
 
     print('making predictions...')
     predictions = model.predict(processed_faces)
     print('done \n')
 
-    print(predictions)
     print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
+    face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
+    return list(zip(cropped_face, face_emotion_prediction_dictionary))
+
+
+predict(None)

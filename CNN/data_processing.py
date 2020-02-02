@@ -44,9 +44,9 @@ def crop_face_single(pixel_array, resize=True):
 
 def process_face(image, face, size):
     box_x, box_y, box_w, box_h = getxywh(face)
-    image = image[box_y:box_y + box_h, box_x:box_x + box_w]
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    image = cv2.resize(image, size)
-    image = np.true_divide(image, 255)
-    image = np.stack((image,) * 3, axis=-1)
-    return image
+    cropped_face = image[box_y:box_y + box_h, box_x:box_x + box_w]
+    processed_face = cv2.cvtColor(cropped_face, cv2.COLOR_RGB2GRAY)
+    processed_face = cv2.resize(processed_face, size)
+    processed_face = np.true_divide(processed_face, 255)
+    processed_face = np.stack((processed_face,) * 3, axis=-1)
+    return cropped_face, processed_face

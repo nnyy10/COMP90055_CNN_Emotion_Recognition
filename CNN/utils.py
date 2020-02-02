@@ -8,23 +8,11 @@ from collections import Counter
 import tensorflow as tf
 
 
+emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+
+
 def emotion_int_to_str(emotion_int):
-    if emotion_int == 0:
-        return "Angry"
-    elif emotion_int == 1:
-        return "Disgust"
-    elif emotion_int == 2:
-        return "Fear"
-    elif emotion_int == 3:
-        return "Happy"
-    elif emotion_int == 4:
-        return "Sad"
-    elif emotion_int == 5:
-        return "Surprise"
-    elif emotion_int == 6:
-        return "Neutral"
-    else:
-        return "Invalid"
+    return emotions[emotion_int]
 
 
 def emotion_str_to_int(emotion_str):
@@ -49,6 +37,11 @@ def emotion_str_to_int(emotion_str):
 def get_predicted_emotion(emotion_array):
     emotion_int = np.argmax(emotion_array)
     return emotion_int_to_str(emotion_int)
+
+
+def get_predicted_emotion_dictionary(emotion_array):
+    emotion_dictionary = [(emotion_int_to_str(i), emotion_array[i]) for i in range(7)]
+    return sorted(emotion_dictionary, key=lambda x: x[1], reverse=True)
 
 
 def load_model(model):
