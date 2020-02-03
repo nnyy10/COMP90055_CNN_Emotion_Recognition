@@ -12,7 +12,6 @@ import numpy as np
 import cv2
 
 # @csrf.exempt
-from utils import load_model
 
 
 @app.route('/home', methods=['GET', 'POST'])
