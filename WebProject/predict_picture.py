@@ -1,17 +1,15 @@
 from utils import *
 import cv2
-from keras import backend as K
+import tensorflow as tf
+from keras.backend import set_session
+from face_detection import *
 
-# model = None
-#
-# def load_model_first_time():
-#     global model
-#     model = load_model('best_model.h5')
-#     global graph
-#     graph = tf.get_default_graph()
-#
-#
-# load_model_first_time()
+global graph, model, sess
+sess = tf.Session()
+graph = tf.get_default_graph()
+set_session(sess)
+
+model = tf.keras.models.load_model("model/mode_v1.h5")
 
 
 def predict(image):
@@ -33,9 +31,10 @@ def predict(image):
 
     # with graph.as_default():
     print('making predictions...')
-    model = load_model('model/best_model.h5')
-    predictions = model.predict(processed_faces)
-    K.clear_session()
+    global sess, graph, model
+    with graph.as_default():
+        set_session(sess)
+        predictions = model.predict(processed_faces)
     print('done \n')
 
     print(predictions)
