@@ -41,4 +41,6 @@ def predict(image):
     return list(zip(cropped_face, face_emotion_prediction_dictionary))
 
 
-predict(None)
+result = predict(None)
+if result != None:
+    print(result[0])

@@ -50,3 +50,14 @@ def process_face(image, face, size):
     processed_face = np.true_divide(processed_face, 255)
     processed_face = np.stack((processed_face,) * 3, axis=-1)
     return cropped_face, processed_face
+
+
+def format_x(x, resize, expand_dimension=False, normalize=True):
+    new_x = x
+    if normalize:
+        new_x = np.true_divide(new_x, 255)
+    if resize is not None:
+        new_x = cv2.resize(new_x, resize)
+    if expand_dimension:
+        new_x = np.stack((new_x,) * 3, axis=-1)
+    return new_x

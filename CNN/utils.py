@@ -100,56 +100,13 @@ def plot_loss_history(history):
     plt.show()
 
 
-def load_data():
-    base_image_path = 'data/processed_data'
-    image_type_path = 'base'
+def load_data_from_npy(base_directory):
+    x_train = np.load(os.path.join(base_directory, 'x_train.npy'))
+    x_test = np.load(os.path.join(base_directory, 'x_test.npy'))
+    x_valid = np.load(os.path.join(base_directory, 'x_valid.npy'))
 
-    x_train = np.load(os.path.join(base_image_path, image_type_path, 'x_train.npy'))
-    # x_train_new = []
-    # for x in x_train:
-    #     x_train_new.append(cv2.resize(x, (160, 160)))
-    # x_train = np.array(x_train_new)
-    x_train = np.true_divide(x_train, 255)
-
-    x_test_new = []
-    x_test = np.load(os.path.join(base_image_path, image_type_path, 'x_test.npy'))
-    # for x in x_test:
-    #     x_test_new.append(cv2.resize(x, (160, 160)))
-    # x_test = np.array(x_test_new)
-    x_test = np.true_divide(x_test, 255)
-
-    x_valid_new = []
-    x_valid = np.load(os.path.join(base_image_path, image_type_path, 'x_valid.npy'))
-    # for x in x_valid:
-    #     x_valid_new.append(cv2.resize(x, (160, 160)))
-    # x = np.array(x_valid_new)
-    x_valid = np.true_divide(x_valid, 255)
-
-    y_train = np.load(os.path.join(base_image_path, image_type_path, 'y_train.npy'))
-    y_test = np.load(os.path.join(base_image_path, image_type_path, 'y_test.npy'))
-    y_valid = np.load(os.path.join(base_image_path, image_type_path, 'y_valid.npy'))
+    y_train = np.load(os.path.join(base_directory, 'y_train.npy'))
+    y_test = np.load(os.path.join(base_directory, 'y_test.npy'))
+    y_valid = np.load(os.path.join(base_directory, 'y_valid.npy'))
 
     return x_train, y_train, x_valid, y_valid, x_test, y_test
-
-
-def create_model():
-    model_dir = 'model/keras/model/facenet_keras.h5'
-
-    inception_v1_model = keras.models.load_model(model_dir)
-    cnt = 0
-    for layer in inception_v1_model.layers:
-        if cnt == 200:
-            break
-        layer.trainable = False
-        cnt += 1
-
-
-    model = keras.Sequential()
-
-    model.add(inception_v1_model)
-    model.add(keras.layers.Dense(7, activation='softmax'))
-    print(model.summary())
-
-    model.compile(keras.optimizers.RMSprop(lr=0.00001), metrics=['accuracy'],
-                  loss=tf.keras.losses.categorical_crossentropy)
-    return model
