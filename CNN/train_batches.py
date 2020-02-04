@@ -2,26 +2,27 @@ import numpy as np
 import tensorflow as tf
 import keras
 from os import path
-from utils import load_data_from_npy, y_single_to_list, plot_loss_history, plot_acc_history, print_confusion_matrix
-from data_processing import format_x
+from utils import plot_loss_history, plot_acc_history, print_confusion_matrix
 from models import *
 from keras.preprocessing.image import ImageDataGenerator
 
-BATCH_SIZE = 64
-EPOCH = 30
+BATCH_SIZE = 32
+EPOCH = 10
 OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
 LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
 SAVE_MODEL = True
-PLOT_TRAINING_HISTORY = False
+PLOT_TRAINING_HISTORY = True
 PRINT_CONFUSION_MATRIX = True
 
-model_initializer = pretrained_facenet_inception_v1
-model = model_initializer(print_summary=False)
+model_initializer = pretrained_NASNET
+model = model_initializer(print_summary=True)
 
 # ka = kaggle, uc = uncropped
 DATA_SET_NAME = "KAC"
 # if you wish to give the model an ID
 MODEL_NAME_ID = ""
+
+IMG_SIZE = (331, 331)
 
 print('creating data generator')
 train_datagen = ImageDataGenerator(rescale=1. / 255,
@@ -40,17 +41,17 @@ VALID_DIR = "data/processed_data/cropped_img/valid"
 TEST_DIR = "data/processed_data/cropped_img/test"
 train_generator = train_datagen.flow_from_directory(
     TRAIN_DIR,
-    target_size=(160, 160),
+    target_size=IMG_SIZE,
     batch_size=64)
 
 validation_generator = test_datagen.flow_from_directory(
     VALID_DIR,
-    target_size=(160, 160),
+    target_size=IMG_SIZE,
     batch_size=64)
 
 test_generator = test_datagen.flow_from_directory(
     TEST_DIR,
-    target_size=(160, 160),
+    target_size=IMG_SIZE,
     batch_size=64)
 print('done \n')
 
