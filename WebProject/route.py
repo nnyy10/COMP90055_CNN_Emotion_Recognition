@@ -1,9 +1,13 @@
+import json
 from datetime import datetime
 from flask import render_template, request, redirect, flash, url_for, session
 from app import app, firebase
 import predict_picture
 import numpy as np
 import cv2
+import random
+import string
+import requests
 
 # @csrf.exempt
 
@@ -18,25 +22,18 @@ def register():
         email = user_info.get("email")
         password = user_info.get("password")
 
-        # check_user = User.query.filter_by(username=user_info.get("username")).first()
-        # email = User.query.filter_by(email=user_info.get("email")).first()
-        if email == "":
-            flash("Please enter an email address.")
-            return redirect(url_for("register"))
-        # if email is not None:
-        #     flash("Please use a different email address.")
-        #     return redirect(url_for("register"))
-        # if check_user is not None:
-        #     flash("Please use a different username.")
-        #     return redirect(url_for("register"))
         if password != user_info.get("password2"):
             flash("Passwords are different")
             return redirect(url_for("register"))
 
-        user = firebase.auth().create_user_with_email_and_password(user_info.get("email"), user_info.get("password"))
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
-
+        try:
+            user = firebase.auth().create_user_with_email_and_password(email, password)
+            flash('Congratulations, you are now a registered user!')
+            return redirect(url_for('login'))
+        except requests.exceptions.HTTPError as e:
+            error_json = e.args[1]
+            error = json.loads(error_json)['error']
+            flash(error['message'])
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -51,8 +48,10 @@ def login():
             session['email'] = email
             session['user_id'] = user['localId']
             return redirect(url_for('home'))
-        except:
-            flash('Invalid username or password')
+        except requests.exceptions.HTTPError as e:
+            error_json = e.args[1]
+            error = json.loads(error_json)['error']
+            flash(error['message'])
     return render_template('login.html')
 
 @app.route('/logout')
@@ -66,6 +65,9 @@ def allowed_image(filename):
     ALLOWED_EXTENSIONS = set(['TXT', 'PDF', 'PNG', 'JPG', 'JPEG', 'GIF'])
     return '.' in filename and filename.rsplit('.', 1)[1].upper() in ALLOWED_EXTENSIONS
 
+def randomString(stringLength=10):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -80,7 +82,7 @@ def upload():
         # img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
         if file and allowed_image(file.filename):
-            image = firebase.storage().child('upload/' + session.get('user_id') + '/' + file.filename)
+            image = firebase.storage().child('upload/' + session.get('user_id') + '/' + randomString())
             image.put(file)
             image_location = firebase.storage().child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
             time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
