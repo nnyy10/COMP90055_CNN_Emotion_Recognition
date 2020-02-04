@@ -6,7 +6,6 @@ from utils import load_data_from_npy, y_single_to_list, plot_loss_history, plot_
 from data_processing import format_x
 from models import *
 
-
 BATCH_SIZE = 64
 EPOCH = 4
 OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
@@ -39,7 +38,7 @@ print('done \n')
 
 print('compiling model...')
 model.compile(optimizer=OPTIMIZER, metrics=['accuracy'], loss=LOSS_FUNCTION)
-print('model_compiled')
+print('done \n')
 
 print('fitting model... ')
 history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=EPOCH, verbose=1, validation_data=(x_valid, y_valid))
