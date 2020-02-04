@@ -11,9 +11,9 @@ csv_dir = "Manually_Annotated_file_lists\\training.csv"
 csv_path = os.path.join(base_dir, csv_dir)
 # subDirectory_filePath	face_x	face_y	face_width	face_height	facial_landmarks	expression	valence	arousal
 
-base_save_path = "/data/NiuTong"
+base_save_path = "../data/NiuTong"
 
-emotion_counter = np.zeros(11)
+emotion_counter = np.zeros(7)
 
 File_object = open(r"../output.txt", "w")
 counter = 0
@@ -24,10 +24,12 @@ with open(csv_path, "r") as f:
     for line in reader:
         image_path = os.path.join(base_dir, "Manually_Annotated", "Manually_Annotated_Images", line[0].replace("/","\\"))
         emotion = int(line[6])
-        if emotion_counter[emotion] > 499:
+        if emotion == 7 or emotion == 8 or emotion == 9 or emotion == 10:
+            continue
+        if emotion_counter[emotion] > 3999:
             stop_cond = True
             for e in emotion_counter:
-                if e < 500:
+                if e < 4000:
                     stop_cond = False
                     break
             if stop_cond:
@@ -64,6 +66,7 @@ with open(csv_path, "r") as f:
         write_log_path = os.path.join("../data", "train", str(emotion), save_img_name)
         save_img_path = os.path.join(base_save_path, str(emotion), save_img_name)
         cv2.imwrite(save_img_path, img)
+        print("hello")
 
         log_line = write_log_path + " " + str(face_x_start) + "," + str(face_y_start) + "," + \
                        str(face_x_end) + "," + str(face_y_end) + "," + str(emotion) + "\n"
