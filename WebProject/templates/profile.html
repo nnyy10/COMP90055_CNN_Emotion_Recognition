@@ -12,13 +12,11 @@
             <thead>
             <tr>
                 <th>Email</th>
-                <th>Username</th>
                 <th>History</th>
             </tr>
             </thead>
             <tr>
-                <td>{{ user.email }}</td>
-                <td>{{ user.username }}</td>
+                <td>{{ email }}</td>
                 <td>{{ count }} <a href="{{ url_for('history') }}">(Click for details)</a></td>
             </tr>
         </table>

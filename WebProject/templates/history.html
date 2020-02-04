@@ -19,11 +19,11 @@
             </thead>
             {% for history in histories %}
                 <tr>
-                    <td>{{ history.submit_time }}</td>
-                    <td>{{ history.image_name }}</td>
-                    <td>{{ history.result }}</td>
+                    <td>{{ history["submit_time"] }}</td>
+                    <td>{{ history["image_name"] }}</td>
+                    <td>{{ history["result"] }}</td>
                     <td>
-                        <img src="../static/upload/{{ history.image_name }}" width="100" height="100" alt="User Image"/>
+                        <img src="{{ history["image_location"] }}" width="100" height="100" alt="User Image"/>
                     </td>
 {#                    <td align="center" valign="middle"><input type="button" class="btn-download" onclick="location.href='{{ url_for('downloadVideo',id=history.Video.id) }}'"></td>#}
 {#                    <td align="center" valign="middle"><input type="button" class="btn-delete" onclick="location.href='{{ url_for('deleteVideo',id=history.History.id) }}'"></td>#}

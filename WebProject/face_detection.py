@@ -1,22 +1,8 @@
 import cv2
 from mtcnn import MTCNN
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from keras.backend import set_session
-
-global graph, model, sess
-sess = tf.Session()
-graph = tf.get_default_graph()
-set_session(sess)
-
-detector = MTCNN()
-
-
-def detect_faces(image):
-    global detector, sess, graph
-    with graph.as_default():
-        set_session(sess)
-        faces = [face["box"] for face in detector.detect_faces(image)]
-        return faces
 
 
 def getxywh(face):
