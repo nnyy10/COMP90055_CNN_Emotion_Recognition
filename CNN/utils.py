@@ -61,15 +61,15 @@ def y_list_to_single(y_list):
     return np.asarray(list(map(np.argmax, y_list)))
 
 
-def print_confusion_matrix(y_predicted, y_actual):
+def get_confusion_matrix(y_predicted, y_actual):
     if len(y_predicted) > 0 and len(y_actual) > 0:
         if not isinstance(y_actual[0], numbers.Number):
             y_actual = y_list_to_single(y_actual)
         if not isinstance(y_predicted[0], numbers.Number):
             y_predicted = y_list_to_single(y_predicted)
-        print(pycm.ConfusionMatrix(actual_vector=y_actual, predict_vector=y_predicted))
+        return pycm.ConfusionMatrix(actual_vector=y_actual, predict_vector=y_predicted)
     else:
-        print("invalid input")
+        return None
 
 
 def get_class_num(y_list):

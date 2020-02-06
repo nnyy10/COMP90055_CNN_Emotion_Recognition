@@ -5,6 +5,7 @@ from os import path
 from utils import load_data_from_npy, y_single_to_list, plot_loss_history, plot_acc_history, print_confusion_matrix
 from data_processing import format_x
 from models import *
+import tensorflow_datasets as tfds
 
 BATCH_SIZE = 64
 EPOCH = 4
