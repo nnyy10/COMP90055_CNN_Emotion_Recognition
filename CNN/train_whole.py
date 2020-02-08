@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import keras
 from os import path
-from utils import load_data_from_npy, y_single_to_list, plot_loss_history, plot_acc_history, print_confusion_matrix
+from utils import load_data_from_npy, y_single_to_list, plot_loss_history, plot_acc_history, get_confusion_matrix
 from data_processing import format_x
 from models import *
 import tensorflow_datasets as tfds
@@ -68,4 +68,4 @@ if PLOT_TRAINING_HISTORY:
 
 if PRINT_CONFUSION_MATRIX:
     y_predicted = model.predict(x_test)
-    print_confusion_matrix(y_actual=y_test, y_predicted=y_predicted)
+    print(get_confusion_matrix(y_actual=y_test, y_predicted=y_predicted))

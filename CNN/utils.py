@@ -44,10 +44,6 @@ def get_predicted_emotion_dictionary(emotion_array):
     return sorted(emotion_dictionary, key=lambda x: x[1], reverse=True)
 
 
-def load_model(model):
-    return keras.models.load_model(model)
-
-
 def y_single_to_list(y_single):
     new_y_list = []
     for y in y_single:

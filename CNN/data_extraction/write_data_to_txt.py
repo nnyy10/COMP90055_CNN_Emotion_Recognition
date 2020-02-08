@@ -5,6 +5,31 @@ from face_detection import detect_faces, getxywh
 import numpy as np
 
 
+def num_to_expression(number):
+    if number == 0:
+        return "Neutral"
+    elif number == 1:
+        return "Happy"
+    elif number == 2:
+        return "Sad"
+    elif number == 3:
+        return "Surprise"
+    elif number == 4:
+        return "Fear"
+    elif number == 5:
+        return "Disgust"
+    elif number == 6:
+        return "Anger"
+    elif number == 7:
+        return "Contempt"
+    elif number == 8:
+        return "None"
+    elif number == 9:
+        return "Uncertain"
+    elif number == 10:
+        return "No-face"
+
+
 base_dir = "C:\\Users\\naiyu\\Documents\\Naiyun"
 csv_dir = "Manually_Annotated_file_lists\\training.csv"
 
@@ -23,10 +48,11 @@ with open(csv_path, "r") as f:
     reader.__next__()
     for line in reader:
         image_path = os.path.join(base_dir, "Manually_Annotated", "Manually_Annotated_Images", line[0].replace("/","\\"))
-        emotion = int(line[6])
-        if emotion == 7 or emotion == 8 or emotion == 9 or emotion == 10:
+        emotion_int = int(line[6])
+        emotion_str = num_to_expression(emotion_int)
+        if emotion_int == 7 or emotion_int == 8 or emotion_int == 9 or emotion_int == 10:
             continue
-        if emotion_counter[emotion] > 3999:
+        if emotion_counter[emotion_int] > 3999:
             stop_cond = True
             for e in emotion_counter:
                 if e < 4000:
@@ -60,16 +86,16 @@ with open(csv_path, "r") as f:
             if face_y_end > 415:
                 face_y_end = 415
 
-        save_img_name = str(emotion) + "_" + str(int(emotion_counter[emotion])) + ".jpg"
-        emotion_counter[emotion] += 1
+        save_img_name = emotion_str + "_" + str(int(emotion_counter[emotion_int])) + ".jpg"
+        emotion_counter[emotion_int] += 1
 
-        write_log_path = os.path.join("../data", "train", str(emotion), save_img_name)
-        save_img_path = os.path.join(base_save_path, str(emotion), save_img_name)
+        write_log_path = os.path.join("../data", "train", emotion_str, save_img_name)
+        save_img_path = os.path.join(base_save_path, emotion_str, save_img_name)
         cv2.imwrite(save_img_path, img)
         print("hello")
 
         log_line = write_log_path + " " + str(face_x_start) + "," + str(face_y_start) + "," + \
-                       str(face_x_end) + "," + str(face_y_end) + "," + str(emotion) + "\n"
+                       str(face_x_end) + "," + str(face_y_end) + "," + str(emotion_int) + "\n"
 
         File_object.write(log_line)
         print(log_line)

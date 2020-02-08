@@ -1,8 +1,5 @@
-import logging
 import os
 
-LOG_FILE_NAME = "MODEL_NAME" + ".out"
-LOG = os.path.join("log", LOG_FILE_NAME)
-logging.basicConfig(filename=LOG, filemode="w", level=logging.DEBUG)
-logging.info("1")
-logging.info("2")
+
+print(list(os.listdir("C:\\Users\\naiyu\\Documents\\Naiyun\\ProcessedData\\colored\\train")))
+print(list(os.walk("C:\\Users\\naiyu\\Documents\\Naiyun\\ProcessedData\\colored\\train\\0")))

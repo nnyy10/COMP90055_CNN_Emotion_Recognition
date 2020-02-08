@@ -1,6 +1,7 @@
 import keras
 import tensorflow as tf
 
+
 def pretrained_facenet_inception_v1(print_summary=False):
     model_dir = 'model/keras/model/facenet_keras.h5'
 

@@ -10,7 +10,7 @@ model = tf.keras.models.load_model("model/keras/model/mode_v1.h5")
 
 def predict(image):
     print('Reading image...')
-    image_path = 'data/images/gettyimages-514325215-612x612.jpg'
+    image_path = 'data/images/Fear_1.jpg'
     image = cv2.imread(image_path)
     print('done \n')
 
@@ -24,7 +24,7 @@ def predict(image):
         return None
 
     # # optional line to see the faces in the image
-    # display_all_faces(image, faces)
+    display_all_faces(image, faces)
 
     print('processing faces...')
     processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]

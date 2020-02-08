@@ -1,8 +1,12 @@
 import csv
 import os
+
+import cv2
 import numpy as np
 import shutil
 import ntpath
+from face_detection import *
+from data_processing import format_x
 
 
 def num_to_expression(number):
@@ -51,38 +55,70 @@ def process_csv_file(file_path):
         # counter_test = [2994, 5376, 1018, 563, 255, 152, 995, 150, 1323, 465, 3296]
 
         for row in readCSV:
-            expression_int = int(row[6])
-            expression = num_to_expression(expression_int)
+            expression = row[6]
+            expression_int = int(expression)
+            global cnt
+            if expression_int > 6:
+                cnt += 1
+                print(cnt)
+                continue
 
             img_path = row[0]
             img_path = os.path.join(base_img_path, img_path)
-            img_name = ntpath.basename(img_path)
-            img_name_raw, img_extension = os.path.splitext(img_path)
+            # img_name = ntpath.basename(img_path)
+            # img_name_raw, img_extension = os.path.splitext(img_path)
 
-            if counter[expression_int] % 8 == 7 and counter_validation[expression_int] < 500:
-                save_img_path = "validation"
-                num_to_append = counter_validation[expression_int]
-                counter_validation[expression_int] += 1
-            elif counter[expression_int] % 8 == 6 and counter_test[expression_int] < 500:
-                save_img_path = "test"
-                num_to_append = counter_test[expression_int]
-                counter_test[expression_int] += 1
-            else:
-                save_img_path = "train"
-                num_to_append = counter_train[expression_int]
-                counter_train[expression_int] += 1
+            # if counter[expression_int] % 8 == 7 and counter_validation[expression_int] < 500:
+            #     save_img_path = "validation"
+            #     num_to_append = counter_validation[expression_int]
+            #     counter_validation[expression_int] += 1
+            # elif counter[expression_int] % 8 == 6 and counter_test[expression_int] < 500:
+            #     save_img_path = "test"
+            #     num_to_append = counter_test[expression_int]
+            #     counter_test[expression_int] += 1
+            # else:
+            save_img_path = "train"
+            num_to_append = counter_train[expression_int]
+            counter_train[expression_int] += 1
 
 
             destination_path = os.path.join(save_base_img_path, save_img_path)
             destination_path = os.path.join(destination_path, expression)
 
-            new_destination_file_name = os.path.join(destination_path, expression + "_" + str(int(num_to_append)) + img_extension)
+            new_destination_file_name = os.path.join(destination_path, expression + "_" + str(int(num_to_append)) + ".jpg")
 
-            shutil.move(img_path, new_destination_file_name)
+            # img = cv2.imread(img_path, 0)
+            # img = cv2.imread(img_path)
+            img = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB)
+            img_end = img.shape[0] - 1
+            faces = detect_faces(img)
 
+            if len(faces) != 1:
+                cv2.imwrite(new_destination_file_name, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+            else:
+                x, y, w, h = getxywh(faces[0])
+                face_x_end = x + w
+                face_y_end = y + h
+                if x < 0:
+                    x = 0
+                if y < 0:
+                    y = 0
+                if face_x_end > img_end:
+                    face_x_end = img_end
+                if face_y_end > img_end:
+                    face_y_end = img_end
+                cropped_face = img[y:face_y_end, x:face_x_end]
+                h = cropped_face.shape[0]
+                w = cropped_face.shape[1]
+                hwmax = max(h,w)
+
+                cropped_face = cv2.resize(cropped_face, (hwmax, hwmax))
+
+                cv2.imwrite(new_destination_file_name, cv2.cvtColor(cropped_face, cv2.COLOR_RGB2BGR))
+            #shutil.move(img_path, new_destination_file_name)
 
             counter[expression_int] += 1
-            global cnt
+            cnt
             cnt += 1
             print(cnt)
 
