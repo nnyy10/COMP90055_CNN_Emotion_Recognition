@@ -57,12 +57,19 @@ with open(csv_path, "r") as f:
                 break
             else:
                 images_info.append(line)
-        images_path = []
 
+        # face_info has the path of image the location of face (left,top,right,bottom), and the emotion label.
+        faces_info = []
         for image_info in images_info:
             image_path = image_info[0]
             images_path.append(image_path)
+            face_x = image_info[1]
+            face_y = image_info[2]
+            face_w = image_info[3]
+            face_h = image_info[4]
             emotion_id = image_info[6]
+            face_info = [face_x, face_x + face_w, face_y, face_y + face_h,emotion_id]
+            faces_info.append(face_info)
 
         new_image = img_fill(9, images_path)
         new_image.save(str(save_count)+".jpg")

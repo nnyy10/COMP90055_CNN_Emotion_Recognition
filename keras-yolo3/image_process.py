@@ -10,26 +10,31 @@ import os
 
 
 def pad_image(image, target_size):
-    iw, ih = image.size  # 原始图像的尺寸
+    img = Image.open(image[0])
+    iw, ih = img.size  # 原始图像的尺寸
     w, h = target_size  # 目标图像的尺寸
     print(iw, ih, target_size)
-    scale = min(float(w) / float(iw), float(h) / float(ih))  # 转换的最小比例
+    rw = float(w) / float(iw)
+    rh = float(h) / float(ih)
+    scale = min(rw, rh)  # 转换的最小比例
 
     # 保证长或宽，至少一个符合目标图像的尺寸
     nw = int(iw * scale)
     nh = int(ih * scale)
-    image = image.resize((nw, nh), Image.BICUBIC)  # 缩小图像
+    img = img.resize((nw, nh), Image.BICUBIC)  # 缩小图像
     # image.show()
-
     new_image = Image.new('RGB', (w,h), (128, 128, 128))  # 生成灰色图像
     # // 为整数除法，计算图像的位置
-    new_image.paste(image, ((w - nw) // 2, (h - nh) // 2))  # 将图像填充为中间图像，两侧为灰色的样式
+    new_image.paste(img, ((w - nw) // 2, (h - nh) // 2))  # 将图像填充为中间图像，两侧为灰色的样式
     #new_image.paste(image, (30,0))
-
-
+    face_left = int(scale*image[1])
+    face_top = int(scale * image[2])
+    face_right = int(scale * image[3])
+    face_bot = int(scale * image[4])
+    face = [new_image,face_left,face_top,face_right,face_bot]
     # new_image.show()
 
-    return new_image
+    return face
 
 def cut_box(num_box,orig_size):
     if num_box in [1,2,4,9]:
@@ -86,22 +91,41 @@ def cut_box(num_box,orig_size):
     else:
         print("Number of boxes should be in (1,2,4,9)")
 
-def img_fill(num_box,images_set):
+def img_fill(num_box,images,faces_info):
     target_size = [416,416]
     boxes_size = cut_box(num_box,target_size)
     if num_box == len(boxes_size)-1:
-        # randomly return same numbers of images
-        images = random.sample(images_set, num_box)
         #resize_imgs =[]
         final_image = Image.new('RGB', (416, 416), (128, 128, 128))
-        for i, image in enumerate(images):
-            print(image)
-            img = Image.open(image)
+        all_faces = []
+        for i, image in enumerate(faces_info):
 
-            resize_img = pad_image(img,boxes_size[i])
+            #img = Image.open(image[0])
+            face = pad_image(image,boxes_size[i])
+            resize_img = face[0]
             #resize_imgs.append(resize_img)
             final_image.paste(resize_img, boxes_size[-1][i])
-        return final_image
+            #the size of box
+            box_w,box_h = boxes_size[i]
+            #the location of left-corner of box.(x,y)
+            box_x,box_y = boxes_size[-1][i]
+            #image_loc = the location of left-corner of image.
+            if box_w>box_h:
+                image_loc = [box_x+(box_w-box_h)/2,box_y]
+            elif box_w<box_h:
+                image_loc = [box_x,box_y+(box_h-box_w)/2]
+            elif:
+                image_loc = [box_x,box_y]
+            x,y = image_loc
+            left = face[1]+x
+            top = face[2]+y
+            right = face[3]+x
+            bottom = face[4]+y
+            emotion = image[5]
+            data = [left,top,right,bottom,emotion]
+            all_faces.append(data)
+        final_info = [final_image, all_faces]
+        return final_info
     else:
         print("Rise error in cutting box")
 
@@ -123,6 +147,7 @@ def display_all_faces(image, faces):
 
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.show()
+
 
 
 def num_to_expression(number):
@@ -150,47 +175,54 @@ def num_to_expression(number):
         return "No-face"
 
 
-# base_dir = "C:\\Users\\naiyu\\Documents\\Naiyun"
-# csv_dir = "Manually_Annotated_file_lists/.csv"
-#
-# csv_path = os.path.join(base_dir, csv_dir)
-# # subDirectory_filePath	face_x	face_y	face_width	face_height	facial_landmarks	expression	valence	arousal
-#
-# base_save_path = "../data/NiuTong"
-#
-# emotion_counter = np.zeros(7)
-#
-# File_object = open(r"../train_dataset.txt", "w")
-#
-# with open(csv_path, "r") as f:
-#     reader = csv.reader(f, delimiter=",")
-#     reader.__next__()
-#
-#     while reader.__next__() is not None:
-#         number = random(1, 2, 4, 9)
-#         images_info = []
-#         for i in range(number):
-#             line = reader.__next__()
-#             if line is None:
-#                 break
-#             else:
-#                 images_info.append(line)
-#         images_path = []
-#
-#         for image_info in images_info:
-#             image_path = image_info[0]
-#             images_path.append(image_path)
-#             emotion_id = image_info[6]
-#
-#         new_image = img_fill(number, images_path)
+base_dir = "C:\\Users\\naiyu\\Documents\\Naiyun"
+csv_dir = "Manually_Annotated_file_lists/validation_dataset.csv"
+image_dir = "Manually_Annotated/Manually_Annotated_Images"
+csv_path = os.path.join(base_dir, csv_dir)
+# subDirectory_filePath	face_x	face_y	face_width	face_height	facial_landmarks	expression	valence	arousal
+
+base_save_path = "data/"
+
+emotion_counter = np.zeros(7)
+
+File_object = open(r"validation_dataset.txt", "w")
+
+with open(csv_path, "r") as f:
+    reader = csv.reader(f, delimiter=",")
+    reader.__next__()
+
+    while reader.__next__() is not None:
+        number = random(1, 2, 4, 9)
+        count = 0
+        images_info = []
+        for i in range(number):
+            line = reader.__next__()
+            if line is None:
+                break
+            else:
+                images_info.append(line)
+        # face_info has the path of image the location of face (left,top,right,bottom), and the emotion label.
+        faces_info = []
+        for image_info in images_info:
+            image_path = image_info[0]
+            image_final_path = os.path.join(base_dir,image_dir,image_path)
+            face_x = image_info[1]
+            face_y = image_info[2]
+            face_w = image_info[3]
+            face_h = image_info[4]
+            emotion_id = image_info[6]
+            face_info = [image_final_path, face_x,face_x + face_w, face_y, face_y + face_h, emotion_id]
+            faces_info.append(face_info)
 
 
-images = ["data/train/1/1_0.0.jpg","data/train/0/0_0.0.jpg","data/train/0/0_1.0.jpg",
-          "data/train/1/1_1.0.jpg","data/train/6/6_0.0.jpg","data/train/6/6_1.0.jpg",
-          "data/train/1/1_2.0.jpg","data/train/1/1_3.0.jpg","data/train/0/0_2.0.jpg"]
-new_image = img_fill(4,images)
-count = 1
-new_image.save("train_dataset/"+str(count)+".jpg")
+        data_info = img_fill(number, faces_info)
+        new_image = data_info[0]
+        new_image.save("data/"+str(count)+".jpg")
+        count += 1
+
+# images = ["data/train/1/1_0.0.jpg","data/train/0/0_0.0.jpg","data/train/0/0_1.0.jpg",
+#           "data/train/1/1_1.0.jpg","data/train/6/6_0.0.jpg","data/train/6/6_1.0.jpg",
+#           "data/train/1/1_2.0.jpg","data/train/1/1_3.0.jpg","data/train/0/0_2.0.jpg"]
 # img = cv2.imread("1.jpg")
 # faces = detect_faces(img)
 # display_all_faces(img,faces)
