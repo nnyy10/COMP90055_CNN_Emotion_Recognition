@@ -1,9 +1,6 @@
 import app as app
 from flask import Flask, render_template, session, redirect, url_for, request, flash
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
-from flask_wtf import CSRFProtect
 import config
 import pyrebase
 

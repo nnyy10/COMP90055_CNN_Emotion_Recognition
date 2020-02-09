@@ -63,16 +63,25 @@
 
                     async function hello()
                     {
-                        console.log("in")
                         let user = { name:'john', age:34 };
-                        let formData = new FormData();
+                        let data = JSON.stringify(user);
                         let photo = document.getElementById("input2").files[0];
+                        var reader = new FileReader();
 
-                        formData.append("photo", photo);
-                        formData.append("user", JSON.stringify(user));
+                        reader.onload = function() {
+                            callback(reader.result);
+                         }
 
+                        reader.readAsDataURL(photo);
+                        console.log(reader.readAsDataURL(file))
+                        console.log(photo)
                         try {
-                           let r = await fetch('/predict_api', {method: "POST", body: formData});
+                           let r = await fetch('/predict_api', {method: "POST",
+                           headers: {
+                              'Accept': 'application/json',
+                              'Content-Type': 'application/json'
+                           },
+                           body: data});
                            console.log(r)
                            console.log('HTTP response code:',r.status);
                         } catch(e) {
