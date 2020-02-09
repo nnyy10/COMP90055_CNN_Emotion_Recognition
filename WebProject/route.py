@@ -159,7 +159,7 @@ def function():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/predict_api', methods=['GET', 'POST'])
 def predict_api():
-    
+    print(request.json)
     print("hell im in")
     return "hello"
 
