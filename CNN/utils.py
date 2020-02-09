@@ -40,8 +40,10 @@ def get_predicted_emotion(emotion_array):
 
 
 def get_predicted_emotion_dictionary(emotion_array):
-    emotion_dictionary = [(emotion_int_to_str(i), emotion_array[i]) for i in range(7)]
-    return sorted(emotion_dictionary, key=lambda x: x[1], reverse=True)
+    dictionary = {}
+    for i in range(7):
+        dictionary[emotion_int_to_str(i)] = emotion_array[i]
+    return dictionary
 
 
 def y_single_to_list(y_single):

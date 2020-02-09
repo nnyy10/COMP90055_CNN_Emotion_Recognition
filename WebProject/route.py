@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from flask import render_template, request, redirect, flash, url_for, session
+from flask import render_template, request, redirect, flash, url_for, session, jsonify
 from app import app, firebase
 import predict_picture
 import numpy as np
@@ -127,31 +127,41 @@ def profile():
     return render_template('profile.html', email=email, count=count)
 
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/function', methods=['GET', 'POST'])
+# @app.route('/function', methods=['GET', 'POST'])
 def function():
-    if request.method == 'POST':
-        file = request.files['input2']
-        # read image file string data
-        filestr = file.read()
-        # convert string data to numpy array
-        npimg = np.fromstring(filestr, np.uint8)
-        # convert numpy array to image
-        img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-
-        if file and allowed_image(file.filename):
-            result = predict_picture.predict(img)
-            # result = "happy"
-            if result is None:
-                pass
-            else:
-                pass
-
-            flash('Successful upload image!')
-            return render_template('function.html', result=result)
-        else:
-            flash('Error: upload failed!')
+    # if request.method == 'POST':
+    #     file = request.files['input2']
+    #     # read image file string data
+    #     filestr = file.read()
+    #     # convert string data to numpy array
+    #     npimg = np.fromstring(filestr, np.uint8)
+    #     # convert numpy array to image
+    #     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    #
+    #     if file and allowed_image(file.filename):
+    #         result = predict_picture.predict(img)
+    #         # result = "happy"
+    #         if result is None:
+    #             pass
+    #         else:
+    #             pass
+    #
+    #         flash('Successful upload image!')
+    #
+    #         json_result = jsonify(result)
+    #
+    #         return json_result
+    #         # return render_template('function.html', result=result)
+    #     else:
+    #         flash('Error: upload failed!')
     return render_template('function.html')
 
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/predict_api', methods=['GET', 'POST'])
+def predict_api():
+    
+    print("hell im in")
+    return "hello"
 
 # @app.route('/register/', methods=['GET', 'POST'])
 # def register():

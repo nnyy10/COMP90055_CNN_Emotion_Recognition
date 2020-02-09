@@ -52,11 +52,54 @@
                 <div class = "col">
                   <h3>Please select an image </h3>
                     <hr>
-
-                    <form method="post" role="form" enctype="multipart/form-data">
-                        <input id="input2" name="input2" type="file" class="file">
+<!--                    hello-->
+                    <form onsubmit="hello()" id="myAnchor">
+                        <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*" onsubmit="hello()">
                     </form>
+                    <script>
+                    document.getElementById("myAnchor").addEventListener("submit", function(event){
+                      event.preventDefault()
+                    });
 
+                    async function hello()
+                    {
+                        console.log("in")
+                        let user = { name:'john', age:34 };
+                        let formData = new FormData();
+                        let photo = document.getElementById("input2").files[0];
+
+                        formData.append("photo", photo);
+                        formData.append("user", JSON.stringify(user));
+
+                        try {
+                           let r = await fetch('/predict_api', {method: "POST", body: formData});
+                           console.log(r)
+                           console.log('HTTP response code:',r.status);
+                        } catch(e) {
+                           console.log('Huston we have problem...:', e);
+                        }
+                    }
+                    </script>
+<!--                    <script>-->
+<!--                        async function SavePhoto()-->
+<!--                        {-->
+<!--                            console.log("in")-->
+<!--                            let user = { name:'john', age:34 };-->
+<!--                            let formData = new FormData();-->
+<!--                            let photo = document.getElementById("input2").files[0];-->
+
+<!--                            formData.append("photo", photo);-->
+<!--                            formData.append("user", JSON.stringify(user));-->
+
+<!--                            try {-->
+<!--                               let r = await fetch('http://127.0.0.1:5000/predict_api', {method: "POST", body: formData});-->
+<!--                               console.log(r)-->
+<!--                               console.log('HTTP response code:',r.status);-->
+<!--                            } catch(e) {-->
+<!--                               console.log('Huston we have problem...:', e);-->
+<!--                            }-->
+<!--                        }-->
+<!--                    </script>-->
                     <hr>
                     <h3>Result</h3>
                     {{ result }}

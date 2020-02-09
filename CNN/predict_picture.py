@@ -38,9 +38,16 @@ def predict(image):
 
     print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
     face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
+    print(face_emotion_prediction_dictionary)
     return list(zip(cropped_face, face_emotion_prediction_dictionary))
 
 
 result = predict(None)
 if result != None:
+    print(result)
+
     print(result[0])
+
+    print(result[0][0])
+
+    print(result[0][1])
