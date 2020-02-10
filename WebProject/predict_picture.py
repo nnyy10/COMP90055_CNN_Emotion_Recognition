@@ -58,7 +58,7 @@ def predict(image):
         font = cv2.FONT_HERSHEY_PLAIN
         # set the rectangle background to white
         rectangle_bgr = (255, 255, 255)
-        text = face_emotion["emotion"] + ": " + face_emotion["probability"]
+        text = str(i+1) + ". " + face_emotion["emotion"] + ": " + face_emotion["probability"]
         # get the width and height of the text box
         (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
         text_offset_x = x
