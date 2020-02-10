@@ -1,13 +1,30 @@
 {%extends "base.html"%}
 
-<title>Home</title>
+
+{% block title %}
+<title >CNN Face Emotion Detection</title>
+{% endblock title %}
 
 {%block main%}
 
 <div class="container">
-
     <h3>Welcome {{ session.get('email') }}! <br> </h3>
 
+    <div class="row" style="margin-left: 0px">
+        <div class = "col">
+            <h3>Select Image </h3>
+            <hr>
+
+            <form method="post" role="form" enctype="multipart/form-data">
+                <input id="input1" name="input1" type="file" class="file">
+            </form>
+
+            <hr>
+            <h3>Result</h3>
+            {{ result }}
+
+        </div>
+    </div>
 </div>
 
 {%endblock main%}

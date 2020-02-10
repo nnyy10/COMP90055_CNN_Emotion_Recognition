@@ -27,8 +27,9 @@ def predict(image):
 
     print('processing faces...')
     processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]
-    cropped_face = np.array([pair[0] for pair in processed_faces_pair])
-    processed_faces = np.array([pair[1] for pair in processed_faces_pair])
+
+    cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
+    processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)
     print('done \n')
 
     print('making predictions...')
@@ -57,7 +58,7 @@ def predict(image):
         font = cv2.FONT_HERSHEY_PLAIN
         # set the rectangle background to white
         rectangle_bgr = (255, 255, 255)
-        text = face_emotion["emotion"] + ": " + face_emotion["probability"]
+        text = str(i+1) + ". " + face_emotion["emotion"] + ": " + face_emotion["probability"]
         # get the width and height of the text box
         (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
         text_offset_x = x
