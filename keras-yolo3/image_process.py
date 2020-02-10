@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image,ImageDraw
 from matplotlib import pyplot as plt
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 from mtcnn import MTCNN
@@ -10,10 +10,11 @@ import os
 
 
 def pad_image(image, target_size):
+    print("image_path",image[0])
     img = Image.open(image[0])
     iw, ih = img.size  # 原始图像的尺寸
     w, h = target_size  # 目标图像的尺寸
-    print(iw, ih, target_size)
+    print(img.size, target_size)
     rw = float(w) / float(iw)
     rh = float(h) / float(ih)
     scale = min(rw, rh)  # 转换的最小比例
@@ -27,10 +28,11 @@ def pad_image(image, target_size):
     # // 为整数除法，计算图像的位置
     new_image.paste(img, ((w - nw) // 2, (h - nh) // 2))  # 将图像填充为中间图像，两侧为灰色的样式
     #new_image.paste(image, (30,0))
-    face_left = int(scale*image[1])
-    face_top = int(scale * image[2])
-    face_right = int(scale * image[3])
-    face_bot = int(scale * image[4])
+
+    face_left = scale*int(image[1])
+    face_top = scale * int(image[2])
+    face_right = scale * int(image[3])
+    face_bot = scale * int(image[4])
     face = [new_image,face_left,face_top,face_right,face_bot]
     # new_image.show()
 
@@ -91,7 +93,7 @@ def cut_box(num_box,orig_size):
     else:
         print("Number of boxes should be in (1,2,4,9)")
 
-def img_fill(num_box,images,faces_info):
+def img_fill(num_box,faces_info):
     target_size = [416,416]
     boxes_size = cut_box(num_box,target_size)
     if num_box == len(boxes_size)-1:
@@ -114,14 +116,14 @@ def img_fill(num_box,images,faces_info):
                 image_loc = [box_x+(box_w-box_h)/2,box_y]
             elif box_w<box_h:
                 image_loc = [box_x,box_y+(box_h-box_w)/2]
-            elif:
+            else:
                 image_loc = [box_x,box_y]
             x,y = image_loc
-            left = face[1]+x
-            top = face[2]+y
-            right = face[3]+x
-            bottom = face[4]+y
-            emotion = image[5]
+            left = int(x+face[1])
+            top = int(y+face[2])
+            right = int(x+face[3])
+            bottom = int(y+face[4])
+            emotion = int(image[5])
             data = [left,top,right,bottom,emotion]
             all_faces.append(data)
         final_info = [final_image, all_faces]
@@ -148,6 +150,15 @@ def display_all_faces(image, faces):
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.show()
 
+
+def list2str(lists):
+    comma = ","
+    str2 = ""
+    for list in lists:
+        str1 = comma.join(str(i) for i in list)
+        str2 += str1+" "
+    str3 = str2[0:-1]
+    return  str3
 
 
 def num_to_expression(number):
@@ -176,7 +187,7 @@ def num_to_expression(number):
 
 
 base_dir = "C:\\Users\\naiyu\\Documents\\Naiyun"
-csv_dir = "Manually_Annotated_file_lists/validation_dataset.csv"
+csv_dir = "Manually_Annotated_file_lists/training_dataset.csv"
 image_dir = "Manually_Annotated/Manually_Annotated_Images"
 csv_path = os.path.join(base_dir, csv_dir)
 # subDirectory_filePath	face_x	face_y	face_width	face_height	facial_landmarks	expression	valence	arousal
@@ -185,40 +196,62 @@ base_save_path = "data/"
 
 emotion_counter = np.zeros(7)
 
-File_object = open(r"validation_dataset.txt", "w")
+File_object = open(r"train.txt", "w")
 
 with open(csv_path, "r") as f:
     reader = csv.reader(f, delimiter=",")
-    reader.__next__()
-
-    while reader.__next__() is not None:
-        number = random(1, 2, 4, 9)
-        count = 0
+    #reader.__next__()
+    line = reader.__next__()
+    count = 0
+    while line is not None:
+        number = random.choice([1, 2, 4, 9])
+        #number = 2
         images_info = []
-        for i in range(number):
+        images_info.append(line)
+        for i in range(number-1):
             line = reader.__next__()
             if line is None:
                 break
             else:
                 images_info.append(line)
+        line = reader.__next__()
         # face_info has the path of image the location of face (left,top,right,bottom), and the emotion label.
         faces_info = []
         for image_info in images_info:
             image_path = image_info[0]
             image_final_path = os.path.join(base_dir,image_dir,image_path)
-            face_x = image_info[1]
-            face_y = image_info[2]
-            face_w = image_info[3]
-            face_h = image_info[4]
+            face_x = int(image_info[1])
+            face_y = int(image_info[2])
+            face_w = int(image_info[3])
+            face_h = int(image_info[4])
             emotion_id = image_info[6]
-            face_info = [image_final_path, face_x,face_x + face_w, face_y, face_y + face_h, emotion_id]
+            face_info = [image_final_path, face_x,face_y, face_x+face_w, face_y + face_h, emotion_id]
+            print(face_info)
             faces_info.append(face_info)
-
 
         data_info = img_fill(number, faces_info)
         new_image = data_info[0]
-        new_image.save("data/"+str(count)+".jpg")
+        #print("image:",new_image)
+        boxes = data_info[1]
+        save_img_path = "data/train/"+str(count)+".jpg"
+        new_image.save(save_img_path)
+
+        #draw = ImageDraw.Draw(new_image)
+        info = list2str(boxes)
+        write_line = save_img_path+" "+info+"\n"
+            # print(left,top,right,bot)
+            # print(type(new_image))
+            # new_image = np.asarray(new_image)
+            # new_image = cv2.rectangle(new_image, (left, top), (right, bot), (255, 0, 0))
+        File_object.write(write_line)
         count += 1
+        print(str(count)+":"+write_line)
+
+
+        # plt.imshow(cv2.cvtColor(new_image, cv2.COLOR_BGR2RGB))
+        # plt.show()
+
+
 
 # images = ["data/train/1/1_0.0.jpg","data/train/0/0_0.0.jpg","data/train/0/0_1.0.jpg",
 #           "data/train/1/1_1.0.jpg","data/train/6/6_0.0.jpg","data/train/6/6_1.0.jpg",
