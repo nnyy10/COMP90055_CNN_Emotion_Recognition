@@ -8,6 +8,9 @@ import cv2
 import random
 import string
 import requests
+from PIL import Image
+import cv2
+from utils import stringToRGB
 
 # @csrf.exempt
 
@@ -159,9 +162,22 @@ def function():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/predict_api', methods=['GET', 'POST'])
 def predict_api():
-    print(request.json)
-    print("hell im in")
-    return "hello"
+    img_base64 = request.json["image"]
+
+    rgb_img = stringToRGB(img_base64)
+
+    result = predict_picture.predict(rgb_img)
+    if result is None:
+        # flash('Successful upload image!')
+        message = {"found": False}
+        return jsonify(message)
+    else:
+        # print(result)
+        message = {"image": img_base64, "found": True, "faces": result}
+        # print(message)
+        json_result = jsonify(message)
+        return json_result
+
 
 # @app.route('/register/', methods=['GET', 'POST'])
 # def register():

@@ -44,7 +44,7 @@ def predict(image):
     result = []
     for i in range(len(face_emotion_prediction_dictionary)):
         cropped_face_list = cropped_face.tolist()
-        result.append(json.dumps({"face": cropped_face, "prediction": face_emotion_prediction_dictionary}, cls=NumpyEncoder))
+        result.append(json.dumps({"face": rgbToString(cropped_face[i]), "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
 
     # print(face_emotion_prediction_dictionary)
     # print(face_emotion_prediction_dictionary)

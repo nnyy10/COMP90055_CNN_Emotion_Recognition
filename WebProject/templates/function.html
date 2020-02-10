@@ -54,64 +54,67 @@
                     <hr>
 <!--                    hello-->
                     <form onsubmit="hello()" id="myAnchor">
-                        <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*" onsubmit="hello()">
+                        <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">
                     </form>
                     <script>
                     document.getElementById("myAnchor").addEventListener("submit", function(event){
-                      event.preventDefault()
+                        event.preventDefault()
                     });
 
-                    async function hello()
-                    {
-                        let user = { name:'john', age:34 };
-                        let data = JSON.stringify(user);
+                    function hello() {
+                        document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
+
                         let photo = document.getElementById("input2").files[0];
-                        var reader = new FileReader();
 
-                        reader.onload = function() {
-                            callback(reader.result);
-                         }
+                        var FR= new FileReader();
+                        FR.addEventListener("load", function(e) {
+                            var img_split =e.target.result.split(",");
+                            var base64_img = img_split[1];
+                            console.log(img_split[0]);
+                            // construct an HTTP request
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("POST", "/predict_api", true);
+                            xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
-                        reader.readAsDataURL(photo);
-                        console.log(reader.readAsDataURL(file))
-                        console.log(photo)
-                        try {
-                           let r = await fetch('/predict_api', {method: "POST",
-                           headers: {
-                              'Accept': 'application/json',
-                              'Content-Type': 'application/json'
-                           },
-                           body: data});
-                           console.log(r)
-                           console.log('HTTP response code:',r.status);
-                        } catch(e) {
-                           console.log('Huston we have problem...:', e);
-                        }
+                            // send the collected data as JSON
+                            xhr.send(JSON.stringify({"image":base64_img}));
+
+                            xhr.onloadend = function () {
+                                var result = JSON.parse(xhr.response);
+                                // now you can access it's params:
+                                console.log(result);
+                                if (result["found"] == true){
+                                    document.getElementById("result_str").innerHTML = "Found a face! Scroll down to see details.";
+                                    document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
+                                    face_list = result["faces"]
+                                    for(i = 0; i < face_list.length; i++){
+                                        var node = document.createElement("LI");
+                                        var img_node = document.createElement('img');
+                                        var json_face = JSON.parse(result["faces"][i]);
+                                        img_node.src = img_split[0].concat(",",json_face["face"]);
+                                        var textnode = document.createTextNode(json_face["prediction"]);
+                                        node.appendChild(img_node);
+                                        node.appendChild(textnode);
+                                        document.getElementById("face_list").appendChild(node);
+                                    }
+                                }else{
+                                    document.getElementById("result_str").innerHTML = "No face detected, try another image";
+                                }
+
+                            };
+                        });
+                        FR.readAsDataURL(photo);
                     }
                     </script>
-<!--                    <script>-->
-<!--                        async function SavePhoto()-->
-<!--                        {-->
-<!--                            console.log("in")-->
-<!--                            let user = { name:'john', age:34 };-->
-<!--                            let formData = new FormData();-->
-<!--                            let photo = document.getElementById("input2").files[0];-->
 
-<!--                            formData.append("photo", photo);-->
-<!--                            formData.append("user", JSON.stringify(user));-->
-
-<!--                            try {-->
-<!--                               let r = await fetch('http://127.0.0.1:5000/predict_api', {method: "POST", body: formData});-->
-<!--                               console.log(r)-->
-<!--                               console.log('HTTP response code:',r.status);-->
-<!--                            } catch(e) {-->
-<!--                               console.log('Huston we have problem...:', e);-->
-<!--                            }-->
-<!--                        }-->
-<!--                    </script>-->
                     <hr>
                     <h3>Result</h3>
-                    {{ result }}
+                    <p id="result_str"></p>
+                    <img src="#" id="full_img" alt="">
+
+                    <ol id="face_list">
+
+                    </ol>
 
                 </div>
               </div>

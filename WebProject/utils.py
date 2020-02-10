@@ -1,3 +1,4 @@
+import base64
 import json
 
 import keras
@@ -7,7 +8,9 @@ import matplotlib.pyplot as plt
 import numbers
 from collections import Counter
 import tensorflow as tf
-
+from PIL import Image
+import io
+import cv2
 
 emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
@@ -105,3 +108,16 @@ class NumpyEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+
+def stringToRGB(base64_string):
+    imgdata = base64.b64decode(str(base64_string))
+    image = Image.open(io.BytesIO(imgdata))
+    return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
+
+def rgbToString(RGB_array):
+    im_rgb = cv2.cvtColor(RGB_array, cv2.COLOR_BGR2RGB)
+    pil_img = Image.fromarray(im_rgb)
+
+    buff = io.BytesIO()
+    pil_img.save(buff, format="JPEG")
+    return base64.b64encode(buff.getvalue()).decode("utf-8")
