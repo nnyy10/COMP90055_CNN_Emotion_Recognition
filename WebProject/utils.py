@@ -1,16 +1,14 @@
 import base64
 import json
-
-import keras
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import numbers
 from collections import Counter
-import tensorflow as tf
 from PIL import Image
 import io
 import cv2
+import random
+import string
 
 emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
@@ -116,10 +114,19 @@ def stringToRGB(base64_string):
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
 def rgbToString(BGR_array):
-
     im_rgb = cv2.cvtColor(BGR_array.astype('uint8'), cv2.COLOR_BGR2RGB)
     pil_img = Image.fromarray(im_rgb)
 
     buff = io.BytesIO()
     pil_img.save(buff, format="JPEG")
     return base64.b64encode(buff.getvalue()).decode("utf-8")
+
+
+def allowed_image(filename):
+    ALLOWED_EXTENSIONS = set(['TXT', 'PDF', 'PNG', 'JPG', 'JPEG', 'GIF'])
+    return '.' in filename and filename.rsplit('.', 1)[1].upper() in ALLOWED_EXTENSIONS
+
+
+def randomString(stringLength=10):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))

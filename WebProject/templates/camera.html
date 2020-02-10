@@ -5,59 +5,97 @@
 {%block main%}
 
 <style>
-    video{
-        width: 50%;
-        height: 50%;
-        margin: 50px auto;
-        background-color: aquamarine;
-        display: block;
-    }
+#video_container{
+    display:inline-block;
+    width:640px;
+    height:480px;
+    margin: 0 auto;
+    background: black;
+    position:relative;
+    border:5px solid black;
+    border-radius: 10px;
+    box-shadow: 0 5px 50px #333}
+
+#canvas{
+    position:relative;
+    z-index:20;
+}
+<!--    video{-->
+<!--        width: 50%;-->
+<!--        height: 50%;-->
+<!--        margin: 50px auto;-->
+<!--        background-color: aquamarine;-->
+<!--        display: block;-->
+<!--    }-->
 </style>
 
 <div class="container">
   <div class="row">
     <div class = "col">
       <h3>Real-time Prediction</h3>
-{#        <hr>#}
+      <hr>
+      <div id="video_container">
+        <video id="videoElement" width="640" height="480" autoplay style="position:absolute;z-index:1;"></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+      </div>
 
-        <video id="video"></video>
-{#        <video id="video" autoplay style="width: 50%;height: 50%"></video>#}
+      <script>
+        var video = document.querySelector("#videoElement");
+        var canvas = $("#canvas");
+        var ctx = canvas.get()[0].getContext('2d');
 
-        <script>
-            var video = document.getElementById('video');
+        if (navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+              video.srcObject = stream;
+            })
+            .catch(function (err0r) {
+              console.log("Something went wrong!");
+            });
+        }
+
+        timer = setInterval(
+            function () {
+                ctx.drawImage(video, 0, 0, 640, 480);
+            }, 100);
+      </script>
+<!--        <video id="video" autoplay style="width: 50%;height: 50%"></video>-->
+
+<!--        <script>-->
+<!--            var video = document.getElementById('video');-->
 
 
-            if (navigator.mediaDevices.getUserMedia) {
-                //The newest API
-                navigator.mediaDevices.getUserMedia({video : {width: 1000, height: 1000}}).then(success).catch(error);
-            } else if (navigator.webkitGetUserMedia) {
-                //webkit core browser
-                navigator.webkitGetUserMedia({video : {width: 1000, height: 1000}},success, error)
-            } else if (navigator.mozGetUserMedia) {
-                //firfox browser
-                navigator.mozGetUserMedia({video : {width: 1000, height: 1000}}, success, error);
-            } else if (navigator.getUserMedia) {
-                //Old API
-                navigator.getUserMedia({video : {width: 1000, height: 1000}}, success, error);
-            }
+<!--            if (navigator.mediaDevices.getUserMedia) {-->
+<!--                //The newest API-->
+<!--                navigator.mediaDevices.getUserMedia({video : {width: 1000, height: 1000}}).then(success).catch(error);-->
+<!--            } else if (navigator.webkitGetUserMedia) {-->
+<!--                //webkit core browser-->
+<!--                navigator.webkitGetUserMedia({video : {width: 1000, height: 1000}},success, error)-->
+<!--            } else if (navigator.mozGetUserMedia) {-->
+<!--                //firfox browser-->
+<!--                navigator.mozGetUserMedia({video : {width: 1000, height: 1000}}, success, error);-->
+<!--            } else if (navigator.getUserMedia) {-->
+<!--                //Old API-->
+<!--                navigator.getUserMedia({video : {width: 1000, height: 1000}}, success, error);-->
+<!--            }-->
 
-            function success(stream) {
-                //兼容webkit核心浏览器
-                // let CompatibleURL = window.URL || window.webkitURL;
+<!--            function success(stream) {-->
+<!--                //兼容webkit核心浏览器-->
+<!--                // let CompatibleURL = window.URL || window.webkitURL;-->
 
-                //将视频流设置为video元素的源
-                console.log(stream);
+<!--                //将视频流设置为video元素的源-->
+<!--                console.log(stream);-->
 
-                //video.src = CompatibleURL.createObjectURL(stream);
-                video.srcObject = stream;
-                video.play();
-            }
+<!--                //video.src = CompatibleURL.createObjectURL(stream);-->
+<!--                video.srcObject = stream;-->
+<!--                video.play();-->
+<!--            }-->
 
-            function error(error) {
-                console.log(`Error${error.name}, ${error.message}`);
-            }
+<!--            function error(error) {-->
+<!--                console.log(`Error${error.name}, ${error.message}`);-->
+<!--            }-->
 
-        </script>
+<!--        </script>-->
 
     </div>
   </div>
