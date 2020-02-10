@@ -115,9 +115,11 @@ def stringToRGB(base64_string):
     image = Image.open(io.BytesIO(imgdata))
     return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
 
-def rgbToString(RGB_array):
-    im_rgb = cv2.cvtColor(RGB_array, cv2.COLOR_BGR2RGB)
-    pil_img = Image.fromarray(im_rgb)
+def rgbToString(BGR_array):
+    print(type(BGR_array))
+    print(BGR_array.shape)
+    im_rgb = BGR_array[:, :, [2, 1, 0]]
+    pil_img = Image.fromarray(im_rgb.astype('uint8'))
 
     buff = io.BytesIO()
     pil_img.save(buff, format="JPEG")

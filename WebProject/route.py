@@ -178,7 +178,6 @@ def function():
     #         flash('Error: upload failed!')
     return render_template('index.html')
 
-@app.route('/', methods=['GET', 'POST'])
 @app.route('/predict_api', methods=['GET', 'POST'])
 def predict_api():
     img_base64 = request.json["image"]
