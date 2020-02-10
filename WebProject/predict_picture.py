@@ -22,7 +22,7 @@ def predict(image):
 
     if len(faces) == 0:
         print("no face detected in image")
-        return None
+        return None, None
 
 
     print('processing faces...')
@@ -41,12 +41,29 @@ def predict(image):
     print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
     face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
 
+
     result = []
     for i in range(len(face_emotion_prediction_dictionary)):
         cropped_face_list = cropped_face.tolist()
         result.append(json.dumps({"face": rgbToString(cropped_face[i]), "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
 
-    # print(face_emotion_prediction_dictionary)
-    # print(face_emotion_prediction_dictionary)
-    # return face_emotion_prediction_dictionary[0][1]
-    return result
+    boxed_image = image
+    for i, face in enumerate(faces):
+        x, y, w, h = getxywh(face)
+        boxed_image = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 165, 255), 2)
+        face_emotion = face_emotion_prediction_dictionary[i][0]
+
+        font_scale = 0.9
+        font = cv2.FONT_HERSHEY_PLAIN
+        # set the rectangle background to white
+        rectangle_bgr = (255, 255, 255)
+        text = face_emotion["emotion"] + ": " + face_emotion["probability"]
+        # get the width and height of the text box
+        (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
+        text_offset_x = x
+        text_offset_y = y - 1
+        box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + 2, text_offset_y - text_height - 2))
+        cv2.rectangle(image, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
+        cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
+
+    return rgbToString(boxed_image), result

@@ -29,6 +29,12 @@
             height: 750px;
             width: 1200px;
             margin-top: 50px;}
+        li{
+            margin-top: 10px;
+            margin-bottom: 20px;
+            margin-right: 0px;
+            margin-left: 0px;
+        }
     </style>
   </head>
 
@@ -62,6 +68,8 @@
                     });
 
                     function hello() {
+                        document.getElementById("face_list").innerHTML = "";
+                        document.getElementById("full_img").src="";
                         document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
 
                         let photo = document.getElementById("input2").files[0];
@@ -84,7 +92,7 @@
                                 // now you can access it's params:
                                 console.log(result);
                                 if (result["found"] == true){
-                                    document.getElementById("result_str").innerHTML = "Found a face! Scroll down to see details.";
+                                    document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
                                     document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
                                     face_list = result["faces"]
                                     for(i = 0; i < face_list.length; i++){
@@ -92,10 +100,18 @@
                                         var img_node = document.createElement('img');
                                         var json_face = JSON.parse(result["faces"][i]);
                                         img_node.src = img_split[0].concat(",",json_face["face"]);
-                                        var textnode = document.createTextNode(json_face["prediction"]);
+                                        emotion_predictions = json_face["prediction"];
+
+                                        var emotion_text = "  Emotion Probabilities: ";
+                                        for(j = 0; j < emotion_predictions.length; j++){
+                                            emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
+                                        }
+                                        emotion_text = emotion_text.slice(0, -2);
+                                        var textnode = document.createTextNode(emotion_text);
                                         node.appendChild(img_node);
                                         node.appendChild(textnode);
                                         document.getElementById("face_list").appendChild(node);
+                                        console.log(i)
                                     }
                                 }else{
                                     document.getElementById("result_str").innerHTML = "No face detected, try another image";
@@ -111,7 +127,7 @@
                     <h3>Result</h3>
                     <p id="result_str"></p>
                     <img src="#" id="full_img" alt="">
-
+                    <hr>
                     <ol id="face_list">
 
                     </ol>

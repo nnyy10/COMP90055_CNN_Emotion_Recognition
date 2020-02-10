@@ -44,10 +44,11 @@ def get_predicted_emotion(emotion_array):
 
 
 def get_predicted_emotion_dictionary(emotion_array):
-    dictionary = {}
+    emotion_structured = []
     for i in range(7):
-        dictionary[emotion_int_to_str(i)] = str(round(emotion_array[i], 2))
-    return dictionary
+        emotion_structured.append({"emotion": emotion_int_to_str(i), "probability": str(round(emotion_array[i], 2))})
+    emotion_structured = sorted(emotion_structured, key=lambda x: x['probability'], reverse=True)
+    return emotion_structured
 
 
 def y_single_to_list(y_single):
