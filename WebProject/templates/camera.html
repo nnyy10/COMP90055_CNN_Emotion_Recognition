@@ -1,7 +1,9 @@
 {%extends "base.html"%}
 
-<title>Camera</title>
 
+{% block title %}
+<title>Real-time Emotion Detection</title>
+{% endblock title %}
 {%block main%}
 
 <style>
@@ -29,6 +31,7 @@
 <!--    }-->
 
 
+
 </style>
 
 <div class="container">
@@ -37,11 +40,12 @@
             <h3>Real-time Prediction</h3>
             <hr>
             <div style="visibility: hidden;  width:0; height:0;">
-                 <canvas id="canvas" width="640" height="480"></canvas>
+                <canvas id="canvas" width="640" height="480"></canvas>
             </div>
             <div id="video_container">
                 <video id="videoElement" width="640" height="480" autoplay style="position:absolute;z-index:1;"></video>
-                <img id="target" style="display: inline; position:absolute;z-index:1;" width="640" height="480" alt="" src="#" />
+                <img id="target" style="display: inline; position:absolute;z-index:1;" width="640" height="480" alt=""
+                     src="#"/>
             </div>
 
             <script>
@@ -72,7 +76,7 @@
                             console.log(img_split[0]);
                             // construct an HTTP request
                             var xhr = new XMLHttpRequest();
-                            xhr.open("POST", "/predict_api", true);
+                            xhr.open("POST", "/predict_img_only_api", true);
                             xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
                             // send the collected data as JSON
@@ -118,6 +122,7 @@
           return blob;
 
         }
+
 
             </script>
             <!--        <video id="video" autoplay style="width: 50%;height: 50%"></video>-->

@@ -16,37 +16,37 @@ set_session(sess)
 model = keras.models.load_model("model/best_model.h5", compile=False)
 
 
-def predict(image):
+def predict(image, img_only=False):
     faces = detect_faces(image)
-    # with graph.as_default():
 
     if len(faces) == 0:
         print("no face detected in image")
-        return None, None
-
+        if img_only:
+            return None
+        else:
+            return None, None
 
     print('processing faces...')
     processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]
 
-    cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
+    if not img_only:
+        cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
     processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)
-    print('done \n')
 
     print('making predictions...')
     global graph, model, sess
     with graph.as_default():
         set_session(sess)
         predictions = model.predict(processed_faces)
-    print('done \n')
+
 
     print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
     face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
 
-
-    result = []
-    for i in range(len(face_emotion_prediction_dictionary)):
-        cropped_face_list = cropped_face.tolist()
-        result.append(json.dumps({"face": rgbToString(cropped_face[i]), "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
+    if not img_only:
+        result = []
+        for i in range(len(face_emotion_prediction_dictionary)):
+            result.append(json.dumps({"face": rgbToString(cropped_face[i]), "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
 
     boxed_image = image
     for i, face in enumerate(faces):
@@ -67,4 +67,7 @@ def predict(image):
         cv2.rectangle(image, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
         cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
 
-    return rgbToString(boxed_image), result
+    if img_only:
+        return rgbToString(boxed_image)
+    else:
+        return rgbToString(boxed_image), result

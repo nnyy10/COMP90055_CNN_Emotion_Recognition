@@ -34,6 +34,21 @@ def predict_api():
         return json_result
 
 
+@app.route('/predict_img_only_api', methods=['GET', 'POST'])
+def predict_img_only_api():
+    img_base64 = request.json["image"]
+
+    rgb_img = stringToRGB(img_base64)
+    boxed_image = predict_picture.predict(rgb_img, img_only=True)
+    if boxed_image is None:
+        message = {"found": False}
+        return jsonify(message)
+    else:
+        message = {"image": boxed_image, "found": True}
+        json_result = jsonify(message)
+        return json_result
+
+
 @app.route('/predict_upload_api', methods=['GET', 'POST'])
 def predict_upload_api():
     img_base64 = request.json["image"]
