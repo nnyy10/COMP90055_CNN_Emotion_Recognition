@@ -41,7 +41,7 @@
                         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
                         // send the collected data as JSON
-                        xhr.send(JSON.stringify({"image":base64_img}));
+                        xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name}));
 
                         xhr.onloadend = function () {
                             var result = JSON.parse(xhr.response);

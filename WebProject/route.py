@@ -11,6 +11,10 @@ import time
 
 ASK_LOGIN_TEXT = "You must be logged in to access this page!<br><a href = '/login'></b>click here to log in</b></a>"
 
+storage = firebase.storage()
+auth = firebase.auth()
+database = firebase.database()
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -51,24 +55,26 @@ def predict_img_only_api():
 
 @app.route('/predict_upload_api', methods=['GET', 'POST'])
 def predict_upload_api():
-    img_base64 = request.json["image"]
+    json_msg = request.json
+    img_base64 = json_msg["image"]
+    img_name = json_msg["img_name"]
 
     rgb_img = stringToRGB(img_base64)
-    boxed_image, result = predict_picture.predict(rgb_img)
+    boxed_image, result, face_predictions = predict_picture.predict_upload(rgb_img)
     if result is None:
         message = {"found": False}
         return jsonify(message)
     else:
         if 'email' in session:
-            pass
-            # image = firebase.storage().child('upload/' + session.get('user_id') + '/' + randomString())
+            time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+
+            entry_name = database.child('users/' + session.get('user_id')).push({"image_name": img_name,
+                                                                                 "submit_time": time,
+                                                                                 "result": face_predictions})["name"]
+            # image = storage.child('upload/' + session.get('user_id') + '/' + randomString())
             # image.put(file)
-            # image_location = firebase.storage().child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
-            # time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-            # firebase.database().child('users/' + session.get('user_id')).push({"image_name": file.filename,
-            #                                                                      "image_location": image_location,
-            #                                                                      "submit_time": time,
-            #                                                                      "result": result})
+            # image_location = storage.child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
+
         message = {"image": boxed_image, "found": True, "faces": result}
         json_result = jsonify(message)
         return json_result
@@ -82,7 +88,7 @@ def login():
             email = user_info.get("email")
             password = user_info.get("password")
             try:
-                user = firebase.auth().sign_in_with_email_and_password(email, password)
+                user = auth.sign_in_with_email_and_password(email, password)
                 flash('Successful login!')
                 session['email'] = email
                 session['user_id'] = user['localId']
@@ -107,7 +113,7 @@ def register():
             return redirect(url_for("register"))
 
         try:
-            user = firebase.auth().create_user_with_email_and_password(email, password)
+            auth.create_user_with_email_and_password(email, password)
             flash('Congratulations, you are now a registered user!')
             return redirect(url_for('login'))
         except requests.exceptions.HTTPError as e:
@@ -134,7 +140,7 @@ def camera():
 @app.route('/history', methods=['GET', 'POST'])
 def history():
     if 'email' in session:
-        user = firebase.database().child('users').child(session.get('user_id')).get()
+        user = database.child('users').child(session.get('user_id')).get()
         histories = user.val()
         if histories is not None:
             return render_template('history.html', histories=histories.values())
@@ -146,7 +152,7 @@ def history():
 def profile():
     if 'email' in session:
         email = session['email']
-        user = firebase.database().child('users').child(session.get('user_id')).get()
+        user = database.child('users').child(session.get('user_id')).get()
         histories = user.val()
         if histories is not None:
             count = len(histories)
@@ -180,9 +186,9 @@ def logout():
 #         #     # img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 #         #
 #         #     if file and allowed_image(file.filename):
-#         #         image = firebase.storage().child('upload/' + session.get('user_id') + '/' + randomString())
+#         #         image = storage.child('upload/' + session.get('user_id') + '/' + randomString())
 #         #         image.put(file)
-#         #         image_location = firebase.storage().child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
+#         #         image_location = storage.child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
 #         #         time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
 #         #         # result = predict_picture.predict(img)
 #         #         result="happy"
@@ -191,7 +197,7 @@ def logout():
 #         #         # else:
 #         #         #     pass
 #         #         #
-#         #         firebase.database().child('users/' + session.get('user_id')).push({"image_name": file.filename,
+#         #         database.child('users/' + session.get('user_id')).push({"image_name": file.filename,
 #         #                                                                              "image_location": image_location,
 #         #                                                                              "submit_time": time,
 #         #                                                                              "result": result})
