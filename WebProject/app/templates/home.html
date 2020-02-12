@@ -3,6 +3,28 @@
 
 {% block title %}
 <title >CNN Face Emotion Detection</title>
+    <style type="text/css">
+        body{
+            background-repeat: no-repeat;
+            {#background-image: url(/static/img/7.png);#}
+            background-color: #F0F0F0;
+            background-size:cover;
+            font-size: 16px;}
+        .form{
+            background-color: rgba(255, 255, 255, 0.2);
+            width:400px;margin:100px auto;}
+        .container{
+            {#background-color: #F0F0F0;#}
+            height: 750px;
+            width: 1200px;
+            margin-top: 50px;}
+        li{
+            margin-top: 10px;
+            margin-bottom: 20px;
+            margin-right: 0px;
+            margin-left: 0px;
+        }
+    </style>
 {% endblock title %}
 
 {%block main%}
@@ -12,7 +34,14 @@
 
     <div class="row" style="margin-left: 0px">
         <div class = "col">
-            <h3>Select Image </h3>
+            <h3>Please select the model you wish to use</h3>
+                    <input type="radio" id="inception-resnet" name="model_radio" value="inception-resnet" checked>
+                    <label for="inception-resnet">inception-resnet</label>
+                    <input type="radio" id="mobilenetv2" name="model_radio" value="mobilenetv2">
+                    <label for="mobilenetv2">mobilenetv2</label>
+                    <input type="radio" id="yolo3" name="model_radio" value="yolo3">
+                    <label for="yolo3">yolo3</label>
+                    <h3>Please select an image</h3>
             <hr>
                 <form onsubmit="hello()" id="myAnchor">
                     <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">
@@ -41,7 +70,8 @@
                         xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
                         // send the collected data as JSON
-                        xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name}));
+                        var model = document.querySelector('input[name="model_radio"]:checked').value;
+                        xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name, "model":model}));
 
                         xhr.onloadend = function () {
                             var result = JSON.parse(xhr.response);

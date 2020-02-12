@@ -1,3 +1,7 @@
+import base64
+import io
+import os
+from PIL import Image
 from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from flask_bootstrap import Bootstrap
 import config
@@ -33,24 +37,19 @@ def index():
 
 @app.route('/predict_api', methods=['GET', 'POST'])
 def predict_api():
-    print("debug: 1")
     json_msg = request.json
     img_base64 = json_msg["image"]
     model_to_use = json_msg["model"]
 
     if model_to_use != "yolo3":
-        print("debug: 2")
         rgb_img = stringToRGB(img_base64)
         boxed_image, result = predict_picture.predict(rgb_img)
-        print("debug: 3")
         if result is None:
             message = {"found": False}
             return jsonify(message)
         else:
-            print("debug: 4")
-            message = {"image": boxed_image, "found": True, "faces": result}
+            message = {"image": boxed_image[0], "found": True, "faces": result}
             json_result = jsonify(message)
-            print("debug: 5")
             return json_result
     else:
         rgb_img = stringToRGB(img_base64)
@@ -62,7 +61,7 @@ def predict_api():
         else:
             output_rgb = PIL_img_to_RGB(output_PIL)
             boxed_image = rgbToString(output_rgb)
-            message = {"image": boxed_image, "found": True}
+            message = {"image": boxed_image[0], "found": True}
             json_result = jsonify(message)
             return json_result
 
@@ -87,26 +86,46 @@ def predict_upload_api():
     json_msg = request.json
     img_base64 = json_msg["image"]
     img_name = json_msg["img_name"]
+    model_to_use = json_msg["model"]
 
-    rgb_img = stringToRGB(img_base64)
-    boxed_image, result, face_predictions = predict_picture.predict_upload(rgb_img)
-    if result is None:
-        message = {"found": False}
-        return jsonify(message)
+    if model_to_use != "yolo3":
+        rgb_img = stringToRGB(img_base64)
+        boxed_image, result, face_predictions, cropped_face_buff = predict_picture.predict_upload(rgb_img)
+        if result is None:
+            message = {"found": False}
+            return jsonify(message)
+        else:
+            if 'email' in session:
+                time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+
+                entry_name = database.child('users/' + session.get('user_id')).push({"image_name": img_name,
+                                                                                     "submit_time": time,
+                                                                                     "result": face_predictions})["name"]
+
+                image = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + entry_name + '.jpg')
+                image.put(boxed_image[1])
+                img_location = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + entry_name + '.jpg').get_url(None)
+                database.child('users').child(session.get('user_id')).child(entry_name).update({"image_location": img_location})
+                for i, face in enumerate(cropped_face_buff):
+                    image = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + str(i) + '.jpg')
+                    image.put(face)
+
+            message = {"image": boxed_image[0], "found": True, "faces": result}
+            json_result = jsonify(message)
+            return json_result
     else:
-        if 'email' in session:
-            time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-
-            entry_name = database.child('users/' + session.get('user_id')).push({"image_name": img_name,
-                                                                                 "submit_time": time,
-                                                                                 "result": face_predictions})["name"]
-            # image = storage.child('upload/' + session.get('user_id') + '/' + randomString())
-            # image.put(file)
-            # image_location = storage.child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
-
-        message = {"image": boxed_image, "found": True, "faces": result}
-        json_result = jsonify(message)
-        return json_result
+        rgb_img = stringToRGB(img_base64)
+        PIL_img = RGB_to_PIL_img(rgb_img)
+        output_PIL, num_faces = yolo.yolo_model.detect_image(PIL_img)
+        if num_faces == 0:
+            message = {"found": False}
+            return jsonify(message)
+        else:
+            output_rgb = PIL_img_to_RGB(output_PIL)
+            boxed_image = rgbToString(output_rgb)
+            message = {"image": boxed_image[0], "found": True}
+            json_result = jsonify(message)
+            return json_result
 
 
 @app.route('/login', methods=['GET', 'POST'])
