@@ -33,19 +33,24 @@ def index():
 
 @app.route('/predict_api', methods=['GET', 'POST'])
 def predict_api():
+    print("debug: 1")
     json_msg = request.json
     img_base64 = json_msg["image"]
     model_to_use = json_msg["model"]
 
     if model_to_use != "yolo3":
+        print("debug: 2")
         rgb_img = stringToRGB(img_base64)
         boxed_image, result = predict_picture.predict(rgb_img)
+        print("debug: 3")
         if result is None:
             message = {"found": False}
             return jsonify(message)
         else:
+            print("debug: 4")
             message = {"image": boxed_image, "found": True, "faces": result}
             json_result = jsonify(message)
+            print("debug: 5")
             return json_result
     else:
         rgb_img = stringToRGB(img_base64)
