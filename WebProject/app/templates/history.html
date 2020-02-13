@@ -11,9 +11,9 @@
         <table id="example" class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Image</th>
+                    <th width="100">Date</th>
+                    <th width="100">Name</th>
+                    <th width="100">Image</th>
                     <th>Result</th>
                 </tr>
             </thead>
@@ -24,7 +24,28 @@
                     <td>
                         <img src="{{ history["image_location"] }}" width="100" height="100" alt="User Image"/>
                     </td>
-                    <td>{{ history["result"][0][0] }} {{ history["result"][0][1] }} {{ history["result"][0][2] }}</td>
+                    <td>
+                        <ol>
+                            {% for result in history["result"] %}
+
+                            <li>
+                                <img src="{{ result["image_location"] }}" width="50" height="70" alt="User Image"/>
+
+                                {{result["0"]["emotion"]}}: {{result["0"]["probability"]}},
+                                {{result["1"]["emotion"]}}: {{result["1"]["probability"]}},
+                                {{result["2"]["emotion"]}}: {{result["2"]["probability"]}},
+                                {{result["3"]["emotion"]}}: {{result["3"]["probability"]}},
+                                {{result["4"]["emotion"]}}: {{result["4"]["probability"]}},
+                                {{result["5"]["emotion"]}}: {{result["5"]["probability"]}},
+                                {{result["6"]["emotion"]}}: {{result["6"]["probability"]}}
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </td>
+
+
+
+
 {#                    <td align="center" valign="middle"><input type="button" class="btn-download" onclick="location.href='{{ url_for('downloadVideo',id=history.Video.id) }}'"></td>#}
 {#                    <td align="center" valign="middle"><input type="button" class="btn-delete" onclick="location.href='{{ url_for('deleteVideo',id=history.History.id) }}'"></td>#}
                 </tr>

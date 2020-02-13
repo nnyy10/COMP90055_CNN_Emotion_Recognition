@@ -109,6 +109,9 @@ def predict_upload_api():
                 for i, face in enumerate(cropped_face_buff):
                     image = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + str(i) + '.jpg')
                     image.put(face)
+                    img_location = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + str(i) + '.jpg').get_url(None)
+                    database.child('users').child(session.get('user_id')).child(entry_name).child("result").child(str(i)).update(
+                        {"image_location": img_location})
 
             message = {"image": boxed_image[0], "found": True, "faces": result}
             json_result = jsonify(message)
