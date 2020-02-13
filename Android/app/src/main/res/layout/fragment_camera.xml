@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -12,10 +14,45 @@
         android:layout_marginTop="10dp"
         android:text="If want to use more functions, please sign in!"/>
 
+
+    <TextView
+        android:id="@+id/textView_select_model"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select you model:" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup_model"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioButton_inception_resnet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="inception-resnet" />
+
+        <RadioButton
+            android:id="@+id/radioButton_mobilenetv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="mobilenetv2" />
+
+        <RadioButton
+            android:id="@+id/radioButton_yolo3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="yolo3" />
+    </RadioGroup>
+
     <ImageView
         android:id="@+id/ImageView"
         android:layout_width="match_parent"
-        android:src="@drawable/camera"
         android:layout_marginTop="10dp"
         android:layout_height="200dp" />
 
