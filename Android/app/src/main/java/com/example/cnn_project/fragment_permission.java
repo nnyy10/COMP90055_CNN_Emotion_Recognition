@@ -1,10 +1,5 @@
 package com.example.cnn_project;
 
-//public class permission_fragment {
-//}
-
-//package com.example.cnn_project;
-
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -16,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-public class permission_fragment extends Fragment {
+public class fragment_permission extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -1,18 +1,15 @@
 package com.example.cnn_project;
 
-import androidx.fragment.app.Fragment;
-
-//public class camera_fragment extends Fragment {
-//
-//}
-
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -22,49 +19,68 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
 
 import static android.app.Activity.RESULT_CANCELED;
 
-
-public class camera_fragment extends permission_fragment implements View.OnClickListener {
+public class fragment_camera extends fragment_permission {
 
     //需要的权限数组 读/写/相机
     private static String[] PERMISSIONS_STORAGE = {Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA };
 
-    private Button Button01, Button02, loginBtnCamera;
-    private ImageView ImageView01;
+    private TextView loginBtnCamera;
+    private Button choose, upload;
+    private ImageView ImageView;
+    private Context mContext;
+
+    private Uri filePath;
+
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseUser user = firebaseAuth.getCurrentUser();
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
+    StorageReference uidRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//        initView();
+        this.mContext = getActivity();
     }
 
-
     @Override
-     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //通过参数中的布局填充获取对应布局
         View view =inflater.inflate(R.layout.fragment_camera, container,false);
-        Button01 = view.findViewById(R.id.Button01);
-        Button02 = view.findViewById(R.id.Button02);
         loginBtnCamera = view.findViewById(R.id.loginBtnCamera);
-        ImageView01 = view.findViewById(R.id.ImageView);
+        choose = view.findViewById(R.id.choose);
+        upload = view.findViewById(R.id.upload);
+        ImageView = view.findViewById(R.id.ImageView);
 
-        Button01.setOnClickListener(this);
-        Button02.setOnClickListener(this);
         loginBtnCamera.setOnClickListener(loginListener);
+        choose.setOnClickListener(chooseListener);
+
         return view;
-     }
+    }
 
     private View.OnClickListener loginListener = new View.OnClickListener() {
         @Override
@@ -73,25 +89,41 @@ public class camera_fragment extends permission_fragment implements View.OnClick
         }
     };
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.Button01:
-                toPicture();
-//                Toast.makeText(camera_fragment.this,"Button 01",Toast.LENGTH_SHORT).show();
-                Toast.makeText(getContext(), "Button 01", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.Button02:
-                //检查是否已经获得相机的权限
-                if(verifyPermissions(this.getActivity(),PERMISSIONS_STORAGE[2]) == 0){
+    private View.OnClickListener chooseListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(verifyPermissions(fragment_camera.this.getActivity(),PERMISSIONS_STORAGE[2]) == 0){
 //                    L.e("提示是否要授权");
-                    ActivityCompat.requestPermissions(this.getActivity(), PERMISSIONS_STORAGE, 3);
-                }else{
-                    //已经有权限
-                    toCamera();  //打开相机
-                }
-                break;
+                ActivityCompat.requestPermissions(fragment_camera.this.getActivity(), PERMISSIONS_STORAGE, 3);
+            }
+            showTypeDialog();
         }
+    };
+
+    private void showTypeDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog dialog = builder.create();
+        View view = View.inflate(getActivity(), R.layout.fragment_profile_select, null);
+        TextView select_gallery = view.findViewById(R.id.select_gallery);
+        TextView select_camera = view.findViewById(R.id.select_camera);
+
+        select_gallery.setOnClickListener(new View.OnClickListener() {// 在相册中选取
+            @Override
+            public void onClick(View v) {
+                toPicture();
+                dialog.dismiss();
+            }
+        });
+
+        select_camera.setOnClickListener(new View.OnClickListener() {// 调用照相机
+            @Override
+            public void onClick(View v) {
+                toCamera();
+                dialog.dismiss();
+            }
+        });
+        dialog.setView(view);
+        dialog.show();
     }
 
     private File tempFile = null;   //新建一个 File 文件（用于相机拿数据）
@@ -108,7 +140,7 @@ public class camera_fragment extends permission_fragment implements View.OnClick
                     Uri uri01 = data.getData();
                     try {
                         Bitmap bitmap = BitmapFactory.decodeStream(this.getActivity().getContentResolver().openInputStream(uri01));
-                        ImageView01.setImageBitmap(bitmap);
+                        ImageView.setImageBitmap(bitmap);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -120,7 +152,7 @@ public class camera_fragment extends permission_fragment implements View.OnClick
                         tempFile = new File(Environment.getExternalStorageDirectory(),"fileImg.jpg");  //相机取图片数据文件
                         Uri uri02 = Uri.fromFile(tempFile);   //图片文件
                         Bitmap bitmap = BitmapFactory.decodeStream(this.getActivity().getContentResolver().openInputStream(uri02));
-                        ImageView01.setImageBitmap(bitmap);
+                        ImageView.setImageBitmap(bitmap);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -142,8 +174,8 @@ public class camera_fragment extends permission_fragment implements View.OnClick
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);  //跳转到 ACTION_IMAGE_CAPTURE
         //判断内存卡是否可用，可用的话就进行存储
         //putExtra：取值，Uri.fromFile：传一个拍照所得到的文件，fileImg.jpg：文件名
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"fileImg.jpg")));
-        startActivityForResult(intent,101); // 101: 相机的返回码参数（随便一个值就行，只要不冲突就好）
-//        Log.e("跳转相机成功");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "fileImg.jpg")));
+        startActivityForResult(intent, 101); // 101: 相机的返回码参数（随便一个值就行，只要不冲突就好）
+        //Log.e("跳转相机成功");
     }
 }
