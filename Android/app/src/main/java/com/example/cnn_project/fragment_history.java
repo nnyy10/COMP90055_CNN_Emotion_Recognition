@@ -33,15 +33,6 @@ public class fragment_history extends Fragment {
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseUser user = firebaseAuth.getCurrentUser();
 
-
-
-
-
-//    private ListView list_user;
-//    private List<User> userList;
-//    private UserAdapter userAdapter;
-//    private DatabaseReference userRef;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,39 +42,12 @@ public class fragment_history extends Fragment {
         historyList = new ArrayList<>();
         adapter = new HistoryAdapter(fragment_history.this.getActivity(), historyList);
         list_history =view.findViewById(R.id.list_history);
-
-
-
-
-//        userRef = FirebaseDatabase.getInstance().getReference("user");
-//        userList = new ArrayList<>();
-//        userAdapter = new UserAdapter(fragment_history.this.getActivity(), userList);
-//        list_user =view.findViewById(R.id.list_user);
         return view;
 
     }
 
     @Override
     public void onStart() {
-//        userRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                userList.clear();
-//                for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
-//                    User user = userSnapshot.getValue(User.class);
-//                    userList.add(user);
-//                }
-//
-////                HistoryAdapter adapter = new HistoryAdapter(fragment_history.this.getActivity(), historyList);
-//                list_user.setAdapter(userAdapter);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
