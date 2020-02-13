@@ -39,7 +39,6 @@ def predict(image, img_only=False):
         set_session(sess)
         predictions = model.predict(processed_faces)
 
-
     print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
     face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
 
@@ -68,7 +67,7 @@ def predict(image, img_only=False):
         cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
 
     if img_only:
-        return rgbToString(boxed_image)
+        return rgbToString(boxed_image)[0]
     else:
         return rgbToString(boxed_image), result
 
@@ -97,7 +96,9 @@ def predict_upload(image):
 
     result = []
     for i in range(len(face_emotion_prediction_dictionary)):
-        result.append(json.dumps({"face": rgbToString(cropped_face[i]), "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
+        result.append(json.dumps({"face": rgbToString(cropped_face[i])[0], "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
+
+    cropped_face_buff = [rgbToString(face)[1] for face in cropped_face]
 
     boxed_image = image
     for i, face in enumerate(faces):
@@ -119,4 +120,5 @@ def predict_upload(image):
         cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
 
 
-    return rgbToString(boxed_image), result, face_emotion_prediction_dictionary
+
+    return rgbToString(boxed_image), result, face_emotion_prediction_dictionary, cropped_face_buff

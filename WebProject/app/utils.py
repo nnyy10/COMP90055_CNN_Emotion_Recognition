@@ -119,7 +119,8 @@ def rgbToString(BGR_array):
 
     buff = io.BytesIO()
     pil_img.save(buff, format="JPEG")
-    return base64.b64encode(buff.getvalue()).decode("utf-8")
+    buff_value = buff.getvalue()
+    return base64.b64encode(buff_value).decode("utf-8"),  buff_value
 
 
 def allowed_image(filename):
