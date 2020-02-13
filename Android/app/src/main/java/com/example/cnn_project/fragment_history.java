@@ -38,7 +38,7 @@ public class fragment_history extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         String uid = user.getUid();
-        ref = FirebaseDatabase.getInstance().getReference("users/"+uid);
+        ref = FirebaseDatabase.getInstance().getReference("users/" + uid);
         historyList = new ArrayList<>();
         adapter = new HistoryAdapter(fragment_history.this.getActivity(), historyList);
         list_history =view.findViewById(R.id.list_history);
@@ -57,8 +57,6 @@ public class fragment_history extends Fragment {
                     historyList.add(history);
                     System.out.println(history);
                 }
-
-//                HistoryAdapter adapter = new HistoryAdapter(fragment_history.this.getActivity(), historyList);
                 list_history.setAdapter(adapter);
             }
 
