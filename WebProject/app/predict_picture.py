@@ -45,7 +45,7 @@ def predict(image, img_only=False):
     if not img_only:
         result = []
         for i in range(len(face_emotion_prediction_dictionary)):
-            result.append(json.dumps({"face": rgbToString(cropped_face[i]), "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
+            result.append(json.dumps({"face": rgbToString(cropped_face[i])[0], "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
 
     boxed_image = image
     for i, face in enumerate(faces):
