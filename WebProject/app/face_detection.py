@@ -10,16 +10,18 @@ global graph, model, sess
 
 graph = tf.get_default_graph()
 sess = tf.Session(graph=graph)
-set_session(sess)
-detector = MTCNN()
+with sess.graph.as_default():
+    set_session(sess)
+    detector = MTCNN()
 
 
 def detect_faces(image):
     global graph, detector, sess
-    with graph.as_default():
+    with sess.graph.as_default():
         set_session(sess)
         print("debug")
         face_list = detector.detect_faces(image)
+        print("debug2")
         faces = [face["box"] for face in face_list]
         return faces
 
