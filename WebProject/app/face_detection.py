@@ -7,8 +7,9 @@ import keras
 
 
 global graph, model, sess
-sess = tf.Session()
+
 graph = tf.get_default_graph()
+sess = tf.Session(graph=graph)
 set_session(sess)
 detector = MTCNN()
 
@@ -17,7 +18,9 @@ def detect_faces(image):
     global graph, detector, sess
     with graph.as_default():
         set_session(sess)
-        faces = [face["box"] for face in detector.detect_faces(image)]
+        print("debug")
+        face_list = detector.detect_faces(image)
+        faces = [face["box"] for face in face_list]
         return faces
 
 
