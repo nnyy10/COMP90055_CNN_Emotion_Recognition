@@ -332,12 +332,12 @@ public class fragment_camera extends fragment_permission {
         @Override
         protected void onPostExecute(String result) {
 
-            myMethod(result);
+            processResponse(result);
 
         }
     }
 
-    private void myMethod(String response) {
+    private void processResponsex(String response) {
         choose.setEnabled(true);
         upload.setEnabled(true);
 
