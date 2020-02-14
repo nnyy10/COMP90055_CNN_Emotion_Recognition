@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/select_camera"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:textColor="@color/textColor_alert_title"
+            android:textSize="18sp"
+            android:text="Take a photo" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"  />
+
+        <TextView
+            android:id="@+id/select_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_margin="2dp"
+            android:gravity="center"
+            android:textColor="@color/textColor_alert_title"
+            android:textSize="18sp"
+            android:text="Select from gallery" />
+
+    </LinearLayout>
+
+</RelativeLayout>
