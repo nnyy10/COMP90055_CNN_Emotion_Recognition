@@ -22,6 +22,7 @@ global graph, model, sess
 from keras.backend import set_session
 import tensorflow as tf
 import keras
+from utils import stringToRGB, RGB_to_PIL_img, PIL_img_to_RGB, rgbToString
 
 sess = tf.Session()
 graph = tf.get_default_graph()
@@ -147,6 +148,7 @@ class YOLO(object):
         thickness = (image.size[0] + image.size[1]) // 300
         # print("class list:",(list(enumerate(out_classes))))
         # print("box list",out_boxes)
+        prediction = []
         for i, c in reversed(list(enumerate(out_classes))):
             predicted_class = self.class_names[c]
             box = out_boxes[i]
@@ -155,14 +157,14 @@ class YOLO(object):
             label = '{} {:.2f}'.format(predicted_class, score)
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
-
             top, left, bottom, right = box
             top = max(0, np.floor(top + 0.5).astype('int32'))
             left = max(0, np.floor(left + 0.5).astype('int32'))
             bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
             print(label, (left, top), (right, bottom))
-
+            # predicted class, score,crop_box_loction
+            prediction.append([predicted_class,score,(left+thickness,top+thickness,right-thickness,bottom-thickness)])
             if top - label_size[1] >= 0:
                 text_origin = np.array([left, top - label_size[1]])
             else:
@@ -182,7 +184,9 @@ class YOLO(object):
 
         end = timer()
         print("time:",end - start)
-        return image, len(out_boxes)
+        return image, len(out_boxes), prediction
+
+
 
     def close_session(self):
         self.sess.close()
@@ -300,6 +304,25 @@ def detect_video(yolo, video_path, output_path=""):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     yolo.close_session()
+
+
+def predict_detail(original_image,predictions):
+    results =[]
+    for prediction in predictions:
+        lable = prediction[0]
+        score = prediction[1]
+        #(left,top,right,bottom)
+        crop_region = prediction[2]
+        crop_image = original_image.crop(crop_region)
+        output_rgb = PIL_img_to_RGB(crop_image)
+        boxed_image = rgbToString(output_rgb)
+        box_info = {"face":boxed_image[0],"prediction":[{"emotion":lable,"probability":score}]}
+        results.append(box_info)
+    return results
+
+
+
+
 
 
 def detect_camera(yolo):
