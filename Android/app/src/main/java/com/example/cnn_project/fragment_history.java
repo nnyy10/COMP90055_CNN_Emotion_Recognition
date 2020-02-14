@@ -55,7 +55,6 @@ public class fragment_history extends Fragment {
                 for(DataSnapshot historySnapshot : dataSnapshot.getChildren()){
                     History history = historySnapshot.getValue(History.class);
                     historyList.add(history);
-                    System.out.println(history);
                 }
                 list_history.setAdapter(adapter);
             }
