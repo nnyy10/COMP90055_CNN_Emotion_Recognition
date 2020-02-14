@@ -12,11 +12,13 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 //import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
+import android.util.Base64InputStream;
 import android.util.Log;
 import android.util.TimingLogger;
 import android.view.LayoutInflater;
@@ -40,7 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,7 +55,7 @@ public class fragment_camera extends fragment_permission {
     //需要的权限数组 读/写/相机
     private static String[] PERMISSIONS_STORAGE = {Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA };
+            Manifest.permission.CAMERA};
 
     private TextView loginBtnCamera;
     private Button choose, upload;
@@ -64,12 +65,6 @@ public class fragment_camera extends fragment_permission {
 
     private Uri fileURI;
     private String fileString;
-
-//    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-//    private FirebaseUser user = firebaseAuth.getCurrentUser();
-//    FirebaseStorage storage = FirebaseStorage.getInstance();
-//    StorageReference storageRef = storage.getReference();
-//    StorageReference uidRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,53 +90,52 @@ public class fragment_camera extends fragment_permission {
         choose.setOnClickListener(chooseListener);
         upload.setOnClickListener(uploadListender);
 
-
         return view;
     }
 
     private View.OnClickListener uploadListender = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(null!=imageView.getDrawable()){
-                // photo
-                BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
-                Bitmap bitmap = drawable.getBitmap();
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG,100,bos);
-                byte[] bb = bos.toByteArray();
-                String image = Base64.encodeToString(bb, 0);
+            if (null != imageView.getDrawable()) {
+                choose.setEnabled(false);
+                upload.setEnabled(false);
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+                        Bitmap bitmap = drawable.getBitmap();
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        System.out.println("4");
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                        byte[] bb = bos.toByteArray();
+                        String image = Base64.encodeToString(bb, 0);
 
-//                System.out.println(image);
-                String model = "inception-resnet";
-                if (radio_mobilenetv2.isChecked())
-                    model = "mobilenetv2";
-                else if (radio_yolo3.isChecked())
-                    model = "yolo3";
+                        String model = "inception-resnet";
+                        if (radio_mobilenetv2.isChecked())
+                            model = "mobilenetv2";
+                        else if (radio_yolo3.isChecked())
+                            model = "yolo3";
 
-                JSONObject postData = new JSONObject();
-                try {
-                    postData.put("image", image);
-                    postData.put("model", model);
+                        JSONObject postData = new JSONObject();
+                        try {
+                            postData.put("image", image);
+                            postData.put("model", model);
 
 
-//                    new AsyncHttpTask().execute("http://10.1.1.238:5000/predict_api", postData.toString());
-//                    task.execute();
+                            AsyncHttpTask task = new AsyncHttpTask();
+                            task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
 
-//                    JSONObject obj = new JSONObject(response);
 
-//                    System.out.println("face found: " + obj.get("found").toString());
+//                            System.out.println("face found: " + obj.get("found").toString());
 
-//                    Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();
-//                }
-            } else{
-                //no photo
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.start();
+            } else {
+                Toast.makeText(mContext, "No photo selected!", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -173,7 +167,7 @@ public class fragment_camera extends fragment_permission {
                         File photoFile = null;
                         try {
                             photoFile = createImageFile();
-                        } catch (IOException ex){
+                        } catch (IOException ex) {
                             ex.printStackTrace();
                         }
 
@@ -200,21 +194,14 @@ public class fragment_camera extends fragment_permission {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != RESULT_CANCELED) {
+        if (resultCode != RESULT_CANCELED) {
             switch (requestCode) {
                 case 0:
-                    System.out.println("debug1");
-                    System.out.println(resultCode);
-                    System.out.println(RESULT_OK);
-                    System.out.println(data == null);
                     if (resultCode == RESULT_OK) {
-                        System.out.println("debug2");
                         this.fileString = tempPathString;
                         tempPathString = "";
                         this.fileURI = tempPathUri;
                         tempPathUri = null;
-//                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
-//                        imageView.setImageBitmap(selectedImage);
                         Bitmap bitmap = BitmapFactory.decodeFile(fileString);
                         ExifInterface ei = null;
                         try {
@@ -226,7 +213,7 @@ public class fragment_camera extends fragment_permission {
                                 ExifInterface.ORIENTATION_UNDEFINED);
 
                         Bitmap rotatedBitmap = null;
-                        switch(orientation) {
+                        switch (orientation) {
 
                             case ExifInterface.ORIENTATION_ROTATE_90:
                                 rotatedBitmap = rotateImage(bitmap, 90);
@@ -251,7 +238,7 @@ public class fragment_camera extends fragment_permission {
                     break;
                 case 1:
                     if (resultCode == RESULT_OK && data != null) {
-                        Uri selectedImage =  data.getData();
+                        Uri selectedImage = data.getData();
                         String[] filePathColumn = {MediaStore.Images.Media.DATA};
                         if (selectedImage != null) {
                             Cursor cursor = this.getActivity().getContentResolver().query(selectedImage,
@@ -263,11 +250,11 @@ public class fragment_camera extends fragment_permission {
                                 String picturePath = cursor.getString(columnIndex);
                                 this.fileURI = Uri.parse(picturePath);
                                 this.fileString = picturePath;
-                                imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                                System.out.println("in here");
+                                imageView.setImageURI(selectedImage);
                                 cursor.close();
                             }
                         }
-
                     }
                     break;
             }
@@ -298,4 +285,73 @@ public class fragment_camera extends fragment_permission {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
+
+    class AsyncHttpTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+
+            String data = "";
+
+            HttpURLConnection httpURLConnection = null;
+            try {
+
+                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                httpURLConnection.setDoOutput(true);
+
+                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+                wr.writeBytes(params[1]);
+                wr.flush();
+                wr.close();
+
+                int status = httpURLConnection.getResponseCode();
+
+                switch (status) {
+                    case 200:
+                        BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line + "\n");
+                        }
+                        br.close();
+                        return sb.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            myMethod(result);
+
+        }
+    }
+
+    private void myMethod(String response) {
+        choose.setEnabled(true);
+        upload.setEnabled(true);
+
+        try {
+            JSONObject obj = new JSONObject(response);
+
+            if((boolean) obj.get("found"))
+                Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
+            else if(!((boolean) obj.get("found")))
+                Toast.makeText(mContext, "face not found", Toast.LENGTH_LONG).show();
+            System.out.println(obj.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
