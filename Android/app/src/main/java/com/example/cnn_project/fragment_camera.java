@@ -2,6 +2,7 @@ package com.example.cnn_project;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -93,12 +94,14 @@ public class fragment_camera extends fragment_permission {
         return view;
     }
 
+    private ProgressDialog progressDialog;
+
     private View.OnClickListener uploadListender = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (null != imageView.getDrawable()) {
-                choose.setEnabled(false);
-                upload.setEnabled(false);
+                progressDialog = ProgressDialog.show(mContext, "",
+                        "Please wait while the image is being processed...", true);
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
@@ -338,8 +341,7 @@ public class fragment_camera extends fragment_permission {
     }
 
     private void processResponse(String response) {
-        choose.setEnabled(true);
-        upload.setEnabled(true);
+        progressDialog.dismiss();
 
         try {
             JSONObject obj = new JSONObject(response);
@@ -347,8 +349,7 @@ public class fragment_camera extends fragment_permission {
             if((boolean) obj.get("found"))
                 Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
             else if(!((boolean) obj.get("found")))
-                Toast.makeText(mContext, "face not found", Toast.LENGTH_LONG).show();
-            System.out.println(obj.toString());
+                Toast.makeText(mContext, "No face detected in image, try another image.", Toast.LENGTH_LONG).show();
         } catch (JSONException e) {
             e.printStackTrace();
         }
