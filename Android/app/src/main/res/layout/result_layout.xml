@@ -19,17 +19,8 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@+id/submit_time_layout"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginRight="1dp"
-                android:layout_weight="1"
-                android:background="@android:color/background_light"
-                android:text="submit_time" />
-
-            <TextView
-                android:id="@+id/image_name_layout"
-                android:layout_width="100dp"
+                android:id="@+id/result_id_layout"
+                android:layout_width="10dp"
                 android:layout_height="100dp"
                 android:layout_marginRight="1dp"
                 android:layout_weight="1"
@@ -38,21 +29,19 @@
 
 
             <ImageView
-                android:id="@+id/image_layout"
+                android:id="@+id/result_image_layout"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginRight="1dp"
-                android:background="@android:color/background_light"
-                android:layout_weight="1"/>
+                android:background="@android:color/background_light"/>
 
             <TextView
-                android:id="@+id/result_layout"
+                android:id="@+id/result_result_layout"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:background="@android:color/background_light"
-                android:textColor="@color/colorPrimaryDark"
                 android:text="result" />
 
         </LinearLayout>

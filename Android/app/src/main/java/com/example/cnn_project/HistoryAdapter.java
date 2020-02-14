@@ -43,8 +43,9 @@ public class HistoryAdapter extends ArrayAdapter<History> {
 
         History history = historyList.get(position);
         image_name_layout.setText(history.getImage_name());
-        result_layout.setText(history.getResult());
         submit_time_layout.setText(history.getSubmit_time());
+        result_layout.setText("Click");
+//        result_layout.setText(history.getResult());
 
         Picasso.get().load(history.getImage_location()).into(image_layout);
 
