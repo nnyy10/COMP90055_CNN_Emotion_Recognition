@@ -337,7 +337,7 @@ public class fragment_camera extends fragment_permission {
         }
     }
 
-    private void processResponsex(String response) {
+    private void processResponse(String response) {
         choose.setEnabled(true);
         upload.setEnabled(true);
 
