@@ -187,7 +187,7 @@ def num_to_expression(number):
 
 
 base_dir = "C:\\Users\\naiyu\\Documents\\Naiyun"
-csv_dir = "Manually_Annotated_file_lists/training_dataset.csv"
+csv_dir = "Manually_Annotated_file_lists/new_training_dataset.csv"
 image_dir = "Manually_Annotated/Manually_Annotated_Images"
 csv_path = os.path.join(base_dir, csv_dir)
 # subDirectory_filePath	face_x	face_y	face_width	face_height	facial_landmarks	expression	valence	arousal
@@ -196,7 +196,7 @@ base_save_path = "data/"
 
 emotion_counter = np.zeros(7)
 
-File_object = open(r"train.txt", "w")
+File_object = open(r"new_train.txt", "w")
 
 with open(csv_path, "r") as f:
     reader = csv.reader(f, delimiter=",")
@@ -233,7 +233,7 @@ with open(csv_path, "r") as f:
         new_image = data_info[0]
         #print("image:",new_image)
         boxes = data_info[1]
-        save_img_path = "data/train/"+str(count)+".jpg"
+        save_img_path = "data/new_train/"+str(count)+".jpg"
         new_image.save(save_img_path)
 
         #draw = ImageDraw.Draw(new_image)

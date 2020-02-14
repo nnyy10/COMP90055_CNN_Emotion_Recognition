@@ -1,44 +1,53 @@
 package com.example.cnn_project;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 //import android.support.v4.app.ActivityCompat;
+import android.util.Base64;
 import android.util.Log;
+import android.util.TimingLogger;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 public class fragment_camera extends fragment_permission {
 
@@ -49,17 +58,18 @@ public class fragment_camera extends fragment_permission {
 
     private TextView loginBtnCamera;
     private Button choose, upload;
-    private ImageView ImageView;
+    private ImageView imageView;
     private Context mContext;
+    private RadioButton radio_inception_resnet, radio_mobilenetv2, radio_yolo3;
 
-    private Uri filePath;
+    private Uri fileURI;
+    private String fileString;
 
-    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private FirebaseUser user = firebaseAuth.getCurrentUser();
-
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    StorageReference storageRef = storage.getReference();
-    StorageReference uidRef;
+//    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+//    private FirebaseUser user = firebaseAuth.getCurrentUser();
+//    FirebaseStorage storage = FirebaseStorage.getInstance();
+//    StorageReference storageRef = storage.getReference();
+//    StorageReference uidRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,17 +80,71 @@ public class fragment_camera extends fragment_permission {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //通过参数中的布局填充获取对应布局
-        View view =inflater.inflate(R.layout.fragment_camera, container,false);
+        View view = inflater.inflate(R.layout.fragment_camera, container, false);
         loginBtnCamera = view.findViewById(R.id.loginBtnCamera);
         choose = view.findViewById(R.id.choose);
         upload = view.findViewById(R.id.upload);
-        ImageView = view.findViewById(R.id.ImageView);
+        imageView = view.findViewById(R.id.ImageView);
+        radio_inception_resnet = view.findViewById(R.id.radioButton_inception_resnet);
+        radio_mobilenetv2 = view.findViewById(R.id.radioButton_mobilenetv2);
+        radio_yolo3 = view.findViewById(R.id.radioButton_yolo3);
+
+        radio_inception_resnet.setChecked(true);
 
         loginBtnCamera.setOnClickListener(loginListener);
         choose.setOnClickListener(chooseListener);
+        upload.setOnClickListener(uploadListender);
+
 
         return view;
     }
+
+    private View.OnClickListener uploadListender = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(null!=imageView.getDrawable()){
+                // photo
+                BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+                Bitmap bitmap = drawable.getBitmap();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG,100,bos);
+                byte[] bb = bos.toByteArray();
+                String image = Base64.encodeToString(bb, 0);
+
+//                System.out.println(image);
+                String model = "inception-resnet";
+                if (radio_mobilenetv2.isChecked())
+                    model = "mobilenetv2";
+                else if (radio_yolo3.isChecked())
+                    model = "yolo3";
+
+                JSONObject postData = new JSONObject();
+                try {
+                    postData.put("image", image);
+                    postData.put("model", model);
+
+
+//                    new AsyncHttpTask().execute("http://10.1.1.238:5000/predict_api", postData.toString());
+//                    task.execute();
+
+//                    JSONObject obj = new JSONObject(response);
+
+//                    System.out.println("face found: " + obj.get("found").toString());
+
+//                    Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();
+//                }
+            } else{
+                //no photo
+            }
+        }
+    };
 
     private View.OnClickListener loginListener = new View.OnClickListener() {
         @Override
@@ -89,93 +153,149 @@ public class fragment_camera extends fragment_permission {
         }
     };
 
+    Uri tempPathUri;
+    String tempPathString;
     private View.OnClickListener chooseListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(verifyPermissions(fragment_camera.this.getActivity(),PERMISSIONS_STORAGE[2]) == 0){
-//                    L.e("提示是否要授权");
-                ActivityCompat.requestPermissions(fragment_camera.this.getActivity(), PERMISSIONS_STORAGE, 3);
-            }
-            showTypeDialog();
+            final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle("Choose your profile picture");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+
+                    if (options[item].equals("Take Photo")) {
+
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        // Create the File where the photo should go
+                        File photoFile = null;
+                        try {
+                            photoFile = createImageFile();
+                        } catch (IOException ex){
+                            ex.printStackTrace();
+                        }
+
+                        if (photoFile != null) {
+                            Uri photoURI = FileProvider.getUriForFile(mContext,
+                                    "com.example.android.fileprovider",
+                                    photoFile);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                            startActivityForResult(takePictureIntent, 0);
+                        }
+
+                    } else if (options[item].equals("Choose from Gallery")) {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto, 1);
+
+                    } else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                }
+            });
+            builder.show();
         }
     };
 
-    private void showTypeDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final AlertDialog dialog = builder.create();
-        View view = View.inflate(getActivity(), R.layout.fragment_profile_select, null);
-        TextView select_gallery = view.findViewById(R.id.select_gallery);
-        TextView select_camera = view.findViewById(R.id.select_camera);
-
-        select_gallery.setOnClickListener(new View.OnClickListener() {// 在相册中选取
-            @Override
-            public void onClick(View v) {
-                toPicture();
-                dialog.dismiss();
-            }
-        });
-
-        select_camera.setOnClickListener(new View.OnClickListener() {// 调用照相机
-            @Override
-            public void onClick(View v) {
-                toCamera();
-                dialog.dismiss();
-            }
-        });
-        dialog.setView(view);
-        dialog.show();
-    }
-
-    private File tempFile = null;   //新建一个 File 文件（用于相机拿数据）
-
-    //获取 相机 或者 图库 返回的图片
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //判断返回码不等于0
-        if (requestCode != RESULT_CANCELED){    //RESULT_CANCELED = 0(也可以直接写“if (requestCode != 0 )”)
-            //读取返回码
-            switch (requestCode){
-                case 100:   //相册返回的数据（相册的返回码）
-//                    L.e("相册");
-                    Uri uri01 = data.getData();
-                    try {
-                        Bitmap bitmap = BitmapFactory.decodeStream(this.getActivity().getContentResolver().openInputStream(uri01));
-                        ImageView.setImageBitmap(bitmap);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        if(resultCode != RESULT_CANCELED) {
+            switch (requestCode) {
+                case 0:
+                    System.out.println("debug1");
+                    System.out.println(resultCode);
+                    System.out.println(RESULT_OK);
+                    System.out.println(data == null);
+                    if (resultCode == RESULT_OK) {
+                        System.out.println("debug2");
+                        this.fileString = tempPathString;
+                        tempPathString = "";
+                        this.fileURI = tempPathUri;
+                        tempPathUri = null;
+//                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+//                        imageView.setImageBitmap(selectedImage);
+                        Bitmap bitmap = BitmapFactory.decodeFile(fileString);
+                        ExifInterface ei = null;
+                        try {
+                            ei = new ExifInterface(fileString);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                ExifInterface.ORIENTATION_UNDEFINED);
 
+                        Bitmap rotatedBitmap = null;
+                        switch(orientation) {
+
+                            case ExifInterface.ORIENTATION_ROTATE_90:
+                                rotatedBitmap = rotateImage(bitmap, 90);
+                                break;
+
+                            case ExifInterface.ORIENTATION_ROTATE_180:
+                                rotatedBitmap = rotateImage(bitmap, 180);
+                                break;
+
+                            case ExifInterface.ORIENTATION_ROTATE_270:
+                                rotatedBitmap = rotateImage(bitmap, 270);
+                                break;
+
+                            case ExifInterface.ORIENTATION_NORMAL:
+                            default:
+                                rotatedBitmap = bitmap;
+                        }
+
+                        imageView.setImageBitmap(rotatedBitmap);
+
+                    }
                     break;
-                case 101:  //相机返回的数据（相机的返回码）
-//                    L.e("相机");
-                    try {
-                        tempFile = new File(Environment.getExternalStorageDirectory(),"fileImg.jpg");  //相机取图片数据文件
-                        Uri uri02 = Uri.fromFile(tempFile);   //图片文件
-                        Bitmap bitmap = BitmapFactory.decodeStream(this.getActivity().getContentResolver().openInputStream(uri02));
-                        ImageView.setImageBitmap(bitmap);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                case 1:
+                    if (resultCode == RESULT_OK && data != null) {
+                        Uri selectedImage =  data.getData();
+                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                        if (selectedImage != null) {
+                            Cursor cursor = this.getActivity().getContentResolver().query(selectedImage,
+                                    filePathColumn, null, null, null);
+                            if (cursor != null) {
+                                cursor.moveToFirst();
+
+                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                String picturePath = cursor.getString(columnIndex);
+                                this.fileURI = Uri.parse(picturePath);
+                                this.fileString = picturePath;
+                                imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                                cursor.close();
+                            }
+                        }
+
                     }
                     break;
             }
+            System.out.println(fileString.toString());
         }
     }
 
-    //跳转相册
-    private void toPicture() {
-        Intent intent = new Intent(Intent.ACTION_PICK);  //跳转到 ACTION_IMAGE_CAPTURE
-        intent.setType("image/*");
-        startActivityForResult(intent,100);
-//        Log.e("跳转相册成功");
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        tempPathString = image.getAbsolutePath();
+        tempPathUri = Uri.parse(tempPathString);
+        return image;
     }
 
-    //跳转相机
-    private void toCamera() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);  //跳转到 ACTION_IMAGE_CAPTURE
-        //判断内存卡是否可用，可用的话就进行存储
-        //putExtra：取值，Uri.fromFile：传一个拍照所得到的文件，fileImg.jpg：文件名
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "fileImg.jpg")));
-        startActivityForResult(intent, 101); // 101: 相机的返回码参数（随便一个值就行，只要不冲突就好）
-        //Log.e("跳转相机成功");
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 }
