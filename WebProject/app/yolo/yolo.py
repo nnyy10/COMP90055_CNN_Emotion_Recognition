@@ -7,7 +7,7 @@ import colorsys
 import os
 from timeit import default_timer as timer
 import cv2
-
+import codecs, json
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
@@ -34,8 +34,8 @@ class YOLO(object):
         "model_path": 'model/yolo.h5',
         "anchors_path": 'yolo/yolo_anchors.txt',
         "classes_path": 'yolo/emotion_classes.txt',
-        "score" : 0.3,
-        "iou" : 0.45,
+        "score" : 0.2,
+        "iou" : 0.7,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
     }
@@ -141,6 +141,27 @@ class YOLO(object):
                     K.learning_phase(): 0
                 })
 
+            # remove the almost same boxes (when iou >0.7) with lower score.
+            remove_index = []
+            for i, box in enumerate(out_boxes):
+                top1, left1, bottom1, right1 = out_boxes[i]
+                rec1 = (top1, left1, bottom1, right1)
+                if i == out_boxes.shape[0] - 1:
+                    break
+                else:
+                    for j in range(i + 1, out_boxes.shape[0]):
+                        top2, left2, bottom2, right2 = out_boxes[j]
+                        rec2 = (top2, left2, bottom2, right2)
+                        if compute_iou(rec1, rec2) > 0.7:
+                            if out_scores[i] > out_scores[j]:
+                                remove_index.append(j)
+                            else:
+                                remove_index.append(i)
+            remove_index = list(set(remove_index))
+            out_scores = np.delete(out_scores, remove_index)
+            out_boxes = np.delete(out_boxes, remove_index, axis=0)
+            out_classes = np.delete(out_classes, remove_index, axis=0)
+
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
         font = ImageFont.truetype(font='yolo/font/FiraMono-Medium.otf',
@@ -165,6 +186,8 @@ class YOLO(object):
             print(label, (left, top), (right, bottom))
             # predicted class, score,crop_box_loction
             prediction.append([predicted_class,score,(left+thickness,top+thickness,right-thickness,bottom-thickness)])
+
+
             if top - label_size[1] >= 0:
                 text_origin = np.array([left, top - label_size[1]])
             else:
@@ -316,7 +339,7 @@ def predict_detail(original_image,predictions):
         crop_image = original_image.crop(crop_region)
         output_rgb = PIL_img_to_RGB(crop_image)
         boxed_image = rgbToString(output_rgb)
-        box_info = {"face":boxed_image[0],"prediction":[{"emotion":lable,"probability":score}]}
+        box_info = {"face":boxed_image[0],"prediction":[{"emotion":lable,"probability":str(round(score,2))}]}
         results.append(box_info)
     return results
 
@@ -365,6 +388,33 @@ def detect_camera(yolo):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+def compute_iou(rec1, rec2):
+    """
+    computing IoU
+    :param rec1: (y0, x0, y1, x1), which reflects
+            (top, left, bottom, right)
+    :param rec2: (y0, x0, y1, x1)
+    :return: scala value of IoU
+    """
+    # computing area of each rectangles
+    S_rec1 = (rec1[2] - rec1[0]) * (rec1[3] - rec1[1])
+    S_rec2 = (rec2[2] - rec2[0]) * (rec2[3] - rec2[1])
+
+    # computing the sum_area
+    sum_area = S_rec1 + S_rec2
+
+    # find the each edge of intersect rectangle
+    left_line = max(rec1[1], rec2[1])
+    right_line = min(rec1[3], rec2[3])
+    top_line = max(rec1[0], rec2[0])
+    bottom_line = min(rec1[2], rec2[2])
+
+    # judge if there is an intersect
+    if left_line >= right_line or top_line >= bottom_line:
+        return 0
+    else:
+        intersect = (right_line - left_line) * (bottom_line - top_line)
+        return (intersect / (sum_area - intersect)) * 1.0
 
 
 

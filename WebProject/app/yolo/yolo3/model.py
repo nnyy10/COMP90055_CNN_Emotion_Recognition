@@ -141,7 +141,6 @@ def yolo_head(feats, anchors, num_classes, input_shape, calc_loss=False):
     box_wh = K.exp(feats[..., 2:4]) * anchors_tensor / K.cast(input_shape[::-1], K.dtype(feats))
     box_confidence = K.sigmoid(feats[..., 4:5])
     box_class_probs = K.sigmoid(feats[..., 5:])
-    print("class_prob",box_class_probs)
     # with tf.Graph().as_default():
     #     with tf.Session() as sess:
     #         sess.run(tf.global_variables_initializer())

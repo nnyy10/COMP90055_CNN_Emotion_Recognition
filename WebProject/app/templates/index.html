@@ -101,16 +101,24 @@
                                 if (result["found"] == true){
                                     document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
                                     document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
-                                    if(model != "yolo"){
+                                    //if(model != "yolo"){
                                         face_list = result["faces"]
                                         for(i = 0; i < face_list.length; i++){
                                             var node = document.createElement("LI");
                                             var img_node = document.createElement('img');
-                                            var json_face = JSON.parse(result["faces"][i]);
+
+                                            if(model.localeCompare("yolo3") == 0){
+                                                var json_face = result["faces"][i];
+                                                var emotion_text = "  Emotion score: ";
+                                            } else{
+                                                var json_face = JSON.parse(result["faces"][i]);
+                                                var emotion_text = "  Emotion Probabilities: ";
+                                            }
+
                                             img_node.src = img_split[0].concat(",",json_face["face"]);
                                             emotion_predictions = json_face["prediction"];
 
-                                            var emotion_text = "  Emotion Probabilities: ";
+
                                             for(j = 0; j < emotion_predictions.length; j++){
                                                 emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
                                             }
@@ -121,7 +129,9 @@
                                             document.getElementById("face_list").appendChild(node);
                                             console.log(i)
                                         }
-                                    }
+                                    //}else{
+
+                                    //}
                                 }else{
                                     document.getElementById("result_str").innerHTML = "No face detected, try another image";
                                 }
