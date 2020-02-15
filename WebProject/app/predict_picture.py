@@ -45,7 +45,7 @@ def predict(image, img_only=False):
     if not img_only:
         result = []
         for i in range(len(face_emotion_prediction_dictionary)):
-            result.append(json.dumps({"face": rgbToString(cropped_face[i])[0], "prediction": face_emotion_prediction_dictionary[i]}, cls=NumpyEncoder))
+            result.append({"face": rgbToString(cropped_face[i])[0], "prediction": face_emotion_prediction_dictionary[i]})
 
     boxed_image = image
     for i, face in enumerate(faces):
@@ -67,7 +67,7 @@ def predict(image, img_only=False):
         cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
 
     if img_only:
-        return rgbToString(boxed_image)[0]
+        return rgbToString(boxed_image)
     else:
         return rgbToString(boxed_image), result
 
@@ -118,7 +118,5 @@ def predict_upload(image):
         box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + 2, text_offset_y - text_height - 2))
         cv2.rectangle(image, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
         cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
-
-
 
     return rgbToString(boxed_image), result, face_emotion_prediction_dictionary, cropped_face_buff
