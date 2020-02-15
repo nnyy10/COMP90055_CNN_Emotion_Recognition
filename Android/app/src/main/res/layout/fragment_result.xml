@@ -4,6 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:text="Result Fragment"/>
+
     <ImageView
         android:id="@+id/image_layout"
         android:layout_width="100dp"

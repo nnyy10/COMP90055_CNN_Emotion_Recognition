@@ -1,5 +1,6 @@
 package com.example.cnn_project;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,7 +30,8 @@ public class fragment_history extends Fragment {
     private List<History> historyList;
     private HistoryAdapter adapter;
 
-    private DatabaseReference ref;
+    private DatabaseReference uidRef;
+    private String imgRef;
 
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -38,9 +41,9 @@ public class fragment_history extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         String uid = user.getUid();
-        ref = FirebaseDatabase.getInstance().getReference("users/" + uid);
+        uidRef = FirebaseDatabase.getInstance().getReference("users/" + uid);
         historyList = new ArrayList<>();
-        adapter = new HistoryAdapter(fragment_history.this.getActivity(), historyList);
+        adapter = new HistoryAdapter((AppCompatActivity) getContext(), historyList);
         list_history =view.findViewById(R.id.list_history);
         return view;
 
@@ -48,12 +51,14 @@ public class fragment_history extends Fragment {
 
     @Override
     public void onStart() {
-        ref.addValueEventListener(new ValueEventListener() {
+        uidRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 historyList.clear();
                 for(DataSnapshot historySnapshot : dataSnapshot.getChildren()){
                     History history = historySnapshot.getValue(History.class);
+                    imgRef = historySnapshot.getKey();
+
                     historyList.add(history);
                 }
                 list_history.setAdapter(adapter);

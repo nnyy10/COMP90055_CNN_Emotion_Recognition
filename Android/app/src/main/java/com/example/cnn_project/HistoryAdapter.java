@@ -1,6 +1,7 @@
 package com.example.cnn_project;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.FragmentManager;
 
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -21,10 +25,10 @@ public class HistoryAdapter extends ArrayAdapter<History> {
     private TextView image_name_layout, result_layout, submit_time_layout;
     private ImageView image_layout;
 
-    private Activity context;
+    private AppCompatActivity context;
     private List<History> historyList;
 
-    public HistoryAdapter(Activity context, List<History> historyList){
+    public HistoryAdapter(AppCompatActivity context, List<History> historyList){
         super(context, R.layout.history_layout, historyList);
         this.context = context;
         this.historyList = historyList;
@@ -49,6 +53,16 @@ public class HistoryAdapter extends ArrayAdapter<History> {
 
         Picasso.get().load(history.getImage_location()).into(image_layout);
 
+        result_layout.setOnClickListener(resultListener);
+
         return listViewItem;
     }
+
+    private View.OnClickListener resultListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            context.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new fragment_result()).commit();
+        }
+    };
+
 }
