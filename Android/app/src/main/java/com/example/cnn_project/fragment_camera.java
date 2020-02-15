@@ -124,7 +124,7 @@ public class fragment_camera extends fragment_permission {
                             postData.put("model", model);
 
                             AsyncHttpTask task = new AsyncHttpTask();
-                            task.execute("http://10.1.1.238:5000/predict_api", postData.toString());
+                            task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -142,6 +142,7 @@ public class fragment_camera extends fragment_permission {
         progressDialog.dismiss();
 
         try {
+            System.out.println(response);
             JSONObject obj = new JSONObject(response);
 
             if((boolean) obj.get("found")) {
