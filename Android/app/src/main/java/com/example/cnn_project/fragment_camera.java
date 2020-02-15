@@ -2,6 +2,7 @@ package com.example.cnn_project;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -93,19 +94,20 @@ public class fragment_camera extends fragment_permission {
         return view;
     }
 
+    private ProgressDialog progressDialog;
+
     private View.OnClickListener uploadListender = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (null != imageView.getDrawable()) {
-                choose.setEnabled(false);
-                upload.setEnabled(false);
+                progressDialog = ProgressDialog.show(mContext, "",
+                        "Please wait while the image is being processed...", true);
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
                         BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
                         Bitmap bitmap = drawable.getBitmap();
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        System.out.println("4");
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                         byte[] bb = bos.toByteArray();
                         String image = Base64.encodeToString(bb, 0);
@@ -121,12 +123,8 @@ public class fragment_camera extends fragment_permission {
                             postData.put("image", image);
                             postData.put("model", model);
 
-
                             AsyncHttpTask task = new AsyncHttpTask();
-                            task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
-
-
-//                            System.out.println("face found: " + obj.get("found").toString());
+                            task.execute("http://10.1.1.238:5000/predict_api", postData.toString());
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -139,6 +137,29 @@ public class fragment_camera extends fragment_permission {
             }
         }
     };
+
+    private void processResponse(String response) {
+        progressDialog.dismiss();
+
+        try {
+            JSONObject obj = new JSONObject(response);
+
+            if((boolean) obj.get("found")) {
+                Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
+                fragment_response responseFragment = new fragment_response(obj);
+                getActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, responseFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+            else if(!((boolean) obj.get("found")))
+                Toast.makeText(mContext, "No face detected in image, try another image.", Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     private View.OnClickListener loginListener = new View.OnClickListener() {
         @Override
@@ -250,7 +271,6 @@ public class fragment_camera extends fragment_permission {
                                 String picturePath = cursor.getString(columnIndex);
                                 this.fileURI = Uri.parse(picturePath);
                                 this.fileString = picturePath;
-                                System.out.println("in here");
                                 imageView.setImageURI(selectedImage);
                                 cursor.close();
                             }
@@ -258,7 +278,6 @@ public class fragment_camera extends fragment_permission {
                     }
                     break;
             }
-            System.out.println(fileString.toString());
         }
     }
 
@@ -337,21 +356,6 @@ public class fragment_camera extends fragment_permission {
         }
     }
 
-    private void processResponse(String response) {
-        choose.setEnabled(true);
-        upload.setEnabled(true);
 
-        try {
-            JSONObject obj = new JSONObject(response);
-
-            if((boolean) obj.get("found"))
-                Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
-            else if(!((boolean) obj.get("found")))
-                Toast.makeText(mContext, "face not found", Toast.LENGTH_LONG).show();
-            System.out.println(obj.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 }
 
