@@ -121,15 +121,16 @@ def predict_upload_api():
     else:
         rgb_img = stringToRGB(img_base64)
         PIL_img = RGB_to_PIL_img(rgb_img)
-        output_PIL, num_faces,predictions = yolo.yolo_model.detect_image(PIL_img)
+        oldimg = PIL_img.copy()
+        output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(PIL_img)
         if num_faces == 0:
             message = {"found": False}
             return jsonify(message)
         else:
             output_rgb = PIL_img_to_RGB(output_PIL)
             boxed_image = rgbToString(output_rgb)
-            results = yolo.predict_detail(output_PIL,predictions)
-            message = {"image": boxed_image[0], "found": True,"faces":results}
+            results = yolo.predict_detail(oldimg, predictions)
+            message = {"image": boxed_image[0], "found": True, "faces": results}
             json_result = jsonify(message)
             return json_result
 

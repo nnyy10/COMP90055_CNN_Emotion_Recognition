@@ -2,8 +2,8 @@
 
 
 {% block title %}
-<title >CNN Face Emotion Detection</title>
-    <style type="text/css">
+<title>CNN Face Emotion Detection</title>
+<style type="text/css">
         body{
             background-repeat: no-repeat;
             {#background-image: url(/static/img/7.png);#}
@@ -24,100 +24,94 @@
             margin-right: 0px;
             margin-left: 0px;
         }
-    </style>
+
+
+</style>
 {% endblock title %}
 
 {%block main%}
 
 <div class="container">
-    <h3>Welcome {{ session.get('email') }}! <br> </h3>
+    <h3>Welcome {{ session.get('email') }}! <br></h3>
 
     <div class="row" style="margin-left: 0px">
-        <div class = "col">
+        <div class="col">
             <h3>Please select the model you wish to use</h3>
-                    <input type="radio" id="inception-resnet" name="model_radio" value="inception-resnet" checked>
-                    <label for="inception-resnet">inception-resnet</label>
-                    <input type="radio" id="mobilenetv2" name="model_radio" value="mobilenetv2">
-                    <label for="mobilenetv2">mobilenetv2</label>
-                    <input type="radio" id="yolo3" name="model_radio" value="yolo3">
-                    <label for="yolo3">yolo3</label>
-                    <h3>Please select an image</h3>
+            <input type="radio" id="inception-resnet" name="model_radio" value="inception-resnet" checked>
+            <label for="inception-resnet">inception-resnet</label>
+            <input type="radio" id="mobilenetv2" name="model_radio" value="mobilenetv2">
+            <label for="mobilenetv2">mobilenetv2</label>
+            <input type="radio" id="yolo3" name="model_radio" value="yolo3">
+            <label for="yolo3">yolo3</label>
+            <h3>Please select an image</h3>
             <hr>
-                <form onsubmit="hello()" id="myAnchor">
-                    <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">
-                </form>
+            <form onsubmit="callPredictUploadAPI()" id="myAnchor">
+                <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">
+            </form>
 
-                <script>
-                document.getElementById("myAnchor").addEventListener("submit", function(event){
-                    event.preventDefault()
-                });
+            <script>
+            document.getElementById("myAnchor").addEventListener("submit", function(event){
+                event.preventDefault()
+            });
 
-                function hello() {
-                    document.getElementById("face_list").innerHTML = "";
-                    document.getElementById("full_img").src="";
-                    document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
+            function callPredictUploadAPI() {
+                document.getElementById("face_list").innerHTML = "";
+                document.getElementById("full_img").src="";
+                document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
 
-                    let photo = document.getElementById("input2").files[0];
+                let photo = document.getElementById("input2").files[0];
 
-                    var FR= new FileReader();
-                    FR.addEventListener("load", function(e) {
-                        var img_split =e.target.result.split(",");
-                        var base64_img = img_split[1];
-                        console.log(img_split[0]);
-                        // construct an HTTP request
-                        var xhr = new XMLHttpRequest();
-                        xhr.open("POST", "/predict_upload_api", true);
-                        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                var FR= new FileReader();
+                FR.addEventListener("load", function(e) {
+                    var img_split = e.target.result.split(",");
+                    var base64_img = img_split[1];
 
-                        // send the collected data as JSON
-                        var model = document.querySelector('input[name="model_radio"]:checked').value;
-                        xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name, "model":model}));
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/predict_upload_api", true);
+                    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
-                        xhr.onloadend = function () {
-                            var result = JSON.parse(xhr.response);
-                            // now you can access it's params:
-                            console.log(result);
-                            if (result["found"] == true){
-                                document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
-                                document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
-                                face_list = result["faces"]
-                                for(i = 0; i < face_list.length; i++){
-                                    var node = document.createElement("LI");
-                                    var img_node = document.createElement('img');
-                                    var json_face = JSON.parse(result["faces"][i]);
-                                    img_node.src = img_split[0].concat(",",json_face["face"]);
-                                    emotion_predictions = json_face["prediction"];
+                    var model = document.querySelector('input[name="model_radio"]:checked').value;
+                    xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name, "model":model}));
 
+                    xhr.onloadend = function () {
+                        var result = JSON.parse(xhr.response);
+                        if (result["found"] == true){
+                            document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
+                            document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
+                            face_list = result["faces"]
+                            for(i = 0; i < face_list.length; i++){
+                                var node = document.createElement("LI");
+                                var img_node = document.createElement('img');
+                                var json_face = result["faces"][i];
+                                if(model.localeCompare("yolo3") == 0)
+                                    var emotion_text = "  Emotion score: ";
+                                else
                                     var emotion_text = "  Emotion Probabilities: ";
-                                    for(j = 0; j < emotion_predictions.length; j++){
-                                        emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
-                                    }
-                                    emotion_text = emotion_text.slice(0, -2);
-                                    var textnode = document.createTextNode(emotion_text);
-                                    node.appendChild(img_node);
-                                    node.appendChild(textnode);
-                                    document.getElementById("face_list").appendChild(node);
-                                    console.log(i)
-                                }
-                            }else{
-                                document.getElementById("result_str").innerHTML = "No face detected, try another image";
+                                img_node.src = img_split[0].concat(",",json_face["face"]);
+                                emotion_predictions = json_face["prediction"];
+
+                                for (j = 0; j < emotion_predictions.length; j++)
+                                    emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
+                                emotion_text = emotion_text.slice(0, -2);
+                                var textnode = document.createTextNode(emotion_text);
+                                node.appendChild(img_node);
+                                node.appendChild(textnode);
+                                document.getElementById("face_list").appendChild(node);
                             }
-
-                        };
-                    });
-                    FR.readAsDataURL(photo);
-                }
-                </script>
-
-                <hr>
-                <h3>Result</h3>
-                <p id="result_str"></p>
-                <img src="#" id="full_img" alt="">
-                <hr>
-                <ol id="face_list">
-
-                </ol>
-
+                        }else
+                            document.getElementById("result_str").innerHTML = "No face detected, try another image";
+                    };
+                });
+                FR.readAsDataURL(photo);
+            }
+            </script>
+            <hr>
+            <h3>Result</h3>
+            <p id="result_str"></p>
+            <img src="#" id="full_img" alt="">
+            <hr>
+            <ol id="face_list">
+            </ol>
         </div>
     </div>
 </div>
