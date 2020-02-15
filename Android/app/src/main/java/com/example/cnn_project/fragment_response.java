@@ -62,8 +62,7 @@ public class fragment_response extends Fragment {
             ArrayList<JSONObject> faceArrayList = new ArrayList<>();
 
             for (int i = 0; i< faceList.length(); i++){
-                String jsonEncodedString = (String) faceList.get(i);
-                JSONObject jsonFace = new JSONObject(jsonEncodedString);
+                JSONObject jsonFace = (JSONObject) faceList.get(i);
                 faceArrayList.add(jsonFace);
             }
 
