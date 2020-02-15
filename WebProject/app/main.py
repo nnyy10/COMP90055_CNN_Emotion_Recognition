@@ -54,7 +54,7 @@ def predict_api():
     else:
         rgb_img = stringToRGB(img_base64)
         PIL_img = RGB_to_PIL_img(rgb_img)
-        oldimg=PIL_img.copy()
+        oldimg = PIL_img.copy()
         output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(PIL_img)
         if num_faces == 0:
             message = {"found": False}
@@ -78,7 +78,7 @@ def predict_img_only_api():
         message = {"found": False}
         return jsonify(message)
     else:
-        message = {"image": boxed_image, "found": True}
+        message = {"image": boxed_image[0], "found": True}
         json_result = jsonify(message)
         return json_result
 
