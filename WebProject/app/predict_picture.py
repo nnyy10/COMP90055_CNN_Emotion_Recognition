@@ -77,7 +77,7 @@ def predict_upload(image):
 
     if len(faces) == 0:
         print("no face detected in image")
-        return None, None, None
+        return None, None, None, None
 
     print('processing faces...')
     processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]
