@@ -20,6 +20,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,9 +59,12 @@ public class fragment_history extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 historyList.clear();
                 for(DataSnapshot historySnapshot : dataSnapshot.getChildren()){
-                    History history = historySnapshot.getValue(History.class);
-                    imgRef = historySnapshot.getKey();
-
+                    String imageId = historySnapshot.getKey();
+                    String imageUrl = (String) historySnapshot.child("image_location").getValue();
+                    String imageSubmitTime = (String) historySnapshot.child("submit_time").getValue();
+                    String imageName = (String) historySnapshot.child("image_name").getValue();
+                    Iterable<DataSnapshot> facesSnapshot = historySnapshot.child("result").getChildren();
+                    History history = new History(imageId, imageUrl, imageName, imageSubmitTime, facesSnapshot);
                     historyList.add(history);
                 }
                 list_history.setAdapter(adapter);

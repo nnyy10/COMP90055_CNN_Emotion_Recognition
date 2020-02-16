@@ -44,7 +44,7 @@ public class fragment_response extends Fragment {
 
         this.response = response;
         recyclerView = view.findViewById(R.id.faceRecyclerView);
-        imageView_response_image = view.findViewById(R.id.imageView_reponse_image);
+        imageView_response_image = view.findViewById(R.id.imageView_response_image);
         byte[] decodedString = new byte[0];
         try {
             decodedString = Base64.decode((String) response.get("image"), Base64.DEFAULT);

@@ -45,24 +45,21 @@ public class HistoryAdapter extends ArrayAdapter<History> {
         submit_time_layout = listViewItem.findViewById(R.id.submit_time_layout);
         image_layout = listViewItem.findViewById(R.id.image_layout);
 
-        History history = historyList.get(position);
-        image_name_layout.setText(history.getImage_name());
-        submit_time_layout.setText(history.getSubmit_time());
+        final History history = historyList.get(position);
+        image_name_layout.setText(history.image_name);
+        submit_time_layout.setText(history.submit_time);
         result_layout.setText("Click");
-//        result_layout.setText(history.getResult());
 
-        Picasso.get().load(history.getImage_location()).into(image_layout);
+        Picasso.get().load(history.image_location).into(image_layout);
 
-        result_layout.setOnClickListener(resultListener);
+        result_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragment_result resultFragment = new fragment_result(history.image_location, history.facesSnapshot);
+                context.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, resultFragment).commit();
+            }
+        });
 
         return listViewItem;
     }
-
-    private View.OnClickListener resultListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            context.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new fragment_result()).commit();
-        }
-    };
-
 }
