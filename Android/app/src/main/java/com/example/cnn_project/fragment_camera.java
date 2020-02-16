@@ -58,7 +58,6 @@ public class fragment_camera extends fragment_permission {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA};
 
-    private TextView loginBtnCamera;
     private Button choose, upload;
     private ImageView imageView;
     private Context mContext;
@@ -77,7 +76,6 @@ public class fragment_camera extends fragment_permission {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //通过参数中的布局填充获取对应布局
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
-        loginBtnCamera = view.findViewById(R.id.loginBtnCamera);
         choose = view.findViewById(R.id.choose);
         upload = view.findViewById(R.id.upload);
         imageView = view.findViewById(R.id.ImageView);
@@ -87,7 +85,6 @@ public class fragment_camera extends fragment_permission {
 
         radio_inception_resnet.setChecked(true);
 
-        loginBtnCamera.setOnClickListener(loginListener);
         choose.setOnClickListener(chooseListener);
         upload.setOnClickListener(uploadListender);
 
@@ -124,6 +121,8 @@ public class fragment_camera extends fragment_permission {
                             postData.put("model", model);
 
                             AsyncHttpTask task = new AsyncHttpTask();
+
+//                            task.execute("http://45.113.235.79/predict_api", postData.toString());
                             task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
 
                         } catch (JSONException e) {
@@ -142,7 +141,6 @@ public class fragment_camera extends fragment_permission {
         progressDialog.dismiss();
 
         try {
-            System.out.println(response);
             JSONObject obj = new JSONObject(response);
 
             if((boolean) obj.get("found")) {
@@ -161,13 +159,6 @@ public class fragment_camera extends fragment_permission {
             e.printStackTrace();
         }
     }
-
-    private View.OnClickListener loginListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-        }
-    };
 
     Uri tempPathUri;
     String tempPathString;

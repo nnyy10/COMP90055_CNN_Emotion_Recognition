@@ -1,12 +1,15 @@
 package com.example.cnn_project;
 
+import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Base64;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -56,7 +62,7 @@ public class fragment_result extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_response, container, false);
-
+        getActivity().setTitle("Result");
 
         imageView_response_image = view.findViewById(R.id.imageView_response_image);
         recyclerView = view.findViewById(R.id.faceRecyclerView);
@@ -82,17 +88,36 @@ public class fragment_result extends Fragment {
             faceList.add(faceObject);
         }
 
-
-
-
         FaceResultViewAdapter adapter = new FaceResultViewAdapter(getActivity(), faceList);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext,DividerItemDecoration.VERTICAL));
 
-
         return view;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);//添加菜单不调用该方法是没有用的
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_result, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.main_back:
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new fragment_history()).commit();
+//                startActivity(new Intent(this, LoginActivity.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

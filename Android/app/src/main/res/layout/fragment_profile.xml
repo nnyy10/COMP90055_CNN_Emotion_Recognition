@@ -8,15 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="30dp"
-        android:layout_above="@+id/history_profile"/>
-
-    <TextView
-        android:id="@+id/history_profile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/logout"
-        android:textSize="30dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginLeft="10dp"
+        android:layout_above="@+id/logout"/>
 
     <Button
         android:id="@+id/logout"

@@ -1,28 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/loginBtnCamera"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="If want to use more functions, please sign in!" />
-
-
-    <TextView
         android:id="@+id/textView_select_model"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
         android:text="Select you model:" />
 
     <RadioGroup
         android:id="@+id/radioGroup_model"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/textView_select_model"
         android:orientation="horizontal">
 
         <RadioButton
@@ -48,11 +43,20 @@
             android:text="yolo3" />
     </RadioGroup>
 
+    <View
+        android:layout_below="@+id/radioGroup_model"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"  />
+
     <ImageView
         android:id="@+id/ImageView"
         android:layout_width="match_parent"
-        android:layout_height="335dp"
-        android:layout_marginTop="0dp" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/botton"
+        android:layout_below="@+id/radioGroup_model"
+        android:src="@drawable/camera"
+        android:layout_marginTop="5dp" />
 
     <LinearLayout
         android:id="@+id/botton"
@@ -60,6 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
@@ -77,4 +82,4 @@
             android:text="Upload" />
 
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
