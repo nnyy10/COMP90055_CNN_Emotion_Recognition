@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class fragment_profile extends Fragment {
 
-    private TextView email_profile, history_profile;
+    private TextView email_profile;
     private Button logout;
 
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -29,8 +29,9 @@ public class fragment_profile extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.fragment_profile, container,false);
+        getActivity().setTitle("Profile");
         email_profile = view.findViewById(R.id.email_profile);
-        history_profile = view.findViewById(R.id.history_profile);
+//        history_profile = view.findViewById(R.id.history_profile);
         logout = view.findViewById(R.id.logout);
 
         logout.setOnClickListener(logoutListener);
@@ -41,7 +42,7 @@ public class fragment_profile extends Fragment {
             String uid = user.getUid();
 
             email_profile.setText("Email: " + email);
-            history_profile.setText("Count of History: " + uid);
+//            history_profile.setText("Count of History: " + uid);
         }
 
 

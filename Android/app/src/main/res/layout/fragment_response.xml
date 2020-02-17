@@ -7,8 +7,9 @@
     android:layout_margin="15dp"
     android:orientation="vertical">
 
-    <com.example.cnn_project.ZoomableImageView
-        android:id="@+id/imageView_reponse_image"
+<!--    <com.example.cnn_project.ZoomableImageView-->
+    <ImageView
+        android:id="@+id/imageView_response_image"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         />
