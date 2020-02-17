@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4169e1</color>
-    <color name="colorPrimaryDark">#4169e1</color>
+<!--    <color name="colorPrimary">#4169e1</color>-->
+    <color name="colorPrimary">#BC035CC0</color>
+    <color name="colorPrimaryDark">#BC035CC0</color>
     <color name="colorAccent">#D81B60</color>
 
     <!--覆盖颜色-->
@@ -29,4 +30,6 @@
     <color name="bgColor_actionsheet_cancel_nor">#ffffff</color>
     <!--界面背景灰色-->
     <color name="bgColor_activity">#F1F1F1</color>
+    <!--按钮颜色-->
+    <color name="button_background">#BC035CC0</color>
 </resources>

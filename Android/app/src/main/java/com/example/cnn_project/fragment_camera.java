@@ -122,8 +122,8 @@ public class fragment_camera extends fragment_permission {
 
                             AsyncHttpTask task = new AsyncHttpTask();
 
-//                            task.execute("http://45.113.235.79/predict_api", postData.toString());
-                            task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
+                            task.execute("http://45.113.235.79/predict_api", postData.toString());
+//                            task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
 
                         } catch (JSONException e) {
                             e.printStackTrace();

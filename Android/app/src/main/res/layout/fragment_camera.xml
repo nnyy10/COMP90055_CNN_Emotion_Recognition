@@ -72,6 +72,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@color/button_background"
+            android:textColor="@color/bgColor_alertview_alert_start"
             android:text="Choose" />
 
         <Button
@@ -79,6 +83,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginRight="5dp"
+            android:background="@color/button_background"
+            android:textColor="@color/bgColor_alertview_alert_start"
             android:text="Upload" />
 
     </LinearLayout>
