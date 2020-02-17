@@ -16,7 +16,7 @@ from sklearn.utils import class_weight
 # ----------------------------------------------------------------------------
 """Set training parameters"""
 BATCH_SIZE = 64
-EPOCH = 1
+EPOCH = 50
 OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
 # OPTIMIZER = "adadelta"
 LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy

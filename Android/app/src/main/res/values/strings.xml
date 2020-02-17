@@ -5,16 +5,12 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="home_app_title">About this app</string>
     <string name="home_app_description">
-        Human emotion detection is the process of identifying human emotions from a picture. With
-        this app, you can upload an image and we will first use a face detection algorithm to determine
-        if there is a face(s) present or not and if there is, make a one of 7 emotion predictions:
-        Angry, Happy, Sad, Neutral, Disgust, Surprise and Fear as well as a percentage indicating
-        how certain the algorithm is on the prediction. The predictions are made with convolutional
-        neural networks (CNN) which is currently the state of the art in image processing. The three
+        You can go to the “upload” tab to start predicting images or view a history of all
+        your previous predictions in the “history” tab. The app willmake a one of 7 emotion predictions:
+        Angry, Happy, Sad, Neutral, Disgust, Surprise and Fear and a certainty. The predictions are made with convolutional
+        neural networks which is currently the state of the art in image processing. The three
         models that are used are Inception-ResNetV1, MobileNet and Yolo3 and each having an accuracy
         of 69%, 67% and 48% respectively. In comparison, humans have an accuracy of 68 +- 5% when it
         comes to emotion prediction from faces according to one study.
-        \n\nYou can go to the “upload” tab to start predicting images or view a history of all
-        your previous predictions in the “history” tab.
         \n\nHave fun predicting!</string>
 </resources>
