@@ -18,10 +18,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <activity android:name=".HomeActivity"/>
-        <activity android:name=".LoginActivity"/>
-        <activity android:name=".SignUpActivity"/>
-        <activity android:name=".MainActivity">
+        <activity android:name=".app.home.HomeActivity"/>
+        <activity android:name=".app.authentication.LoginActivity"/>
+        <activity android:name=".app.authentication.SignUpActivity"/>
+        <activity android:name=".app.initial.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

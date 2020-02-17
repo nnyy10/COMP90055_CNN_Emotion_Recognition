@@ -1,4 +1,4 @@
-package com.example.cnn_project;
+package com.example.cnn_project.object;
 
 public class Result {
     String result_id;

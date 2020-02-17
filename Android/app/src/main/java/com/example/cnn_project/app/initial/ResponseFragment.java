@@ -1,9 +1,8 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.initial;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,24 +14,24 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+
+import com.example.cnn_project.R;
+import com.example.cnn_project.ZoomableImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Map;
 
-public class fragment_response extends Fragment {
+public class ResponseFragment extends Fragment {
 
 
     private RecyclerView recyclerView;
     private Context mContext;
     private JSONObject response;
     private ZoomableImageView imageView_response_image;
-    public fragment_response(JSONObject response) {
+    public ResponseFragment(JSONObject response) {
         this.response = response;
     }
 

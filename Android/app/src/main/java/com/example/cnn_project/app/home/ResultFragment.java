@@ -1,21 +1,13 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.home;
 
-import android.app.ActionBar;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,24 +16,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.cnn_project.R;
+import com.example.cnn_project.ZoomableImageView;
+import com.example.cnn_project.object.Face;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Map;
 
-public class fragment_result extends Fragment {
+public class ResultFragment extends Fragment {
 
 
     private RecyclerView recyclerView;
@@ -52,7 +39,7 @@ public class fragment_result extends Fragment {
     private String userID = firebaseAuth.getCurrentUser().getUid();
     private Iterable<DataSnapshot> facesSnapshot;
 
-    public fragment_result(String imageLocation, Iterable<DataSnapshot> facesSnapshot) {
+    public ResultFragment(String imageLocation, Iterable<DataSnapshot> facesSnapshot) {
         this.imageLocation = imageLocation;
         this.facesSnapshot = facesSnapshot;
     }
@@ -61,7 +48,7 @@ public class fragment_result extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View view = inflater.inflate(R.layout.fragment_response, container, false);
+        final View view = inflater.inflate(R.layout.fragment_result, container, false);
         getActivity().setTitle("Result");
 
         imageView_response_image = view.findViewById(R.id.imageView_response_image);
@@ -113,7 +100,7 @@ public class fragment_result extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.main_back:
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new fragment_history()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HistoryFragment()).commit();
 //                startActivity(new Intent(this, LoginActivity.class));
                 break;
         }

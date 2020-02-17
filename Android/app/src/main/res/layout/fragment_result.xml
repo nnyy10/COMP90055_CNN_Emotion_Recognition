@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="15dp"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/imgRef"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="30dp"
-        android:text="Result Fragment"/>
 
     <ImageView
-        android:id="@+id/image_layout"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
-
-    <ListView
-        android:id="@+id/list_result"
+        android:id="@+id/imageView_response_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="200dp"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/faceRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true" />
 
 </LinearLayout>

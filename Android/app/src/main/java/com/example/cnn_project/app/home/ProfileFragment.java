@@ -1,4 +1,4 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.home;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,10 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.cnn_project.R;
+import com.example.cnn_project.app.authentication.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class fragment_profile extends Fragment {
+public class ProfileFragment extends Fragment {
 
     private TextView email_profile;
     private Button logout;

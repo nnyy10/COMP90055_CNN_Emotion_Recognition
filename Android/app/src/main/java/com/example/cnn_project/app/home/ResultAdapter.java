@@ -4,7 +4,7 @@
 //}
 
 
-package com.example.cnn_project;
+package com.example.cnn_project.app.home;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -17,7 +17,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.firebase.storage.StorageReference;
+import com.example.cnn_project.R;
+import com.example.cnn_project.object.Result;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

@@ -1,28 +1,21 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.home;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.firebase.database.DataSnapshot;
+import com.example.cnn_project.R;
+import com.example.cnn_project.object.Face;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class FaceResultViewAdapter extends RecyclerView.Adapter<FaceResultViewAdapter.ViewHolder>{

@@ -1,4 +1,4 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.initial;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -17,21 +17,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-//import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
-import android.util.Base64InputStream;
-import android.util.Log;
-import android.util.TimingLogger;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
+
+import com.example.cnn_project.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,14 +43,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class fragment_camera extends fragment_permission {
+public class InitialFragment extends PermissionFragment {
 
-    //需要的权限数组 读/写/相机
     private static String[] PERMISSIONS_STORAGE = {Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA};
@@ -74,8 +69,7 @@ public class fragment_camera extends fragment_permission {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //通过参数中的布局填充获取对应布局
-        View view = inflater.inflate(R.layout.fragment_camera, container, false);
+        View view = inflater.inflate(R.layout.fragment_initial, container, false);
         choose = view.findViewById(R.id.choose);
         upload = view.findViewById(R.id.upload);
         imageView = view.findViewById(R.id.ImageView);
@@ -145,7 +139,7 @@ public class fragment_camera extends fragment_permission {
 
             if((boolean) obj.get("found")) {
                 Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
-                fragment_response responseFragment = new fragment_response(obj);
+                ResponseFragment responseFragment = new ResponseFragment(obj);
                 getActivity()
                         .getSupportFragmentManager()
                         .beginTransaction()

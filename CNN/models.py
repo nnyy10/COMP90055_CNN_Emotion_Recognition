@@ -6,7 +6,24 @@ def pretrained_facenet_inception_v1(print_summary=False):
     model_dir = 'model/keras/model/facenet_keras.h5'
 
     inception_v1_model = keras.models.load_model(model_dir)
+    inception_v1_model.layers.pop()
+    inception_v1_model.outputs = [inception_v1_model.layers[-1].output]
+    inception_v1_model.layers[-1].outbound_nodes = []
+    inception_v1_model.layers.pop()
+    inception_v1_model.outputs = [inception_v1_model.layers[-2].output]
+    inception_v1_model.layers[-2].outbound_nodes = []
+    inception_v1_model.layers.pop()
+    inception_v1_model.outputs = [inception_v1_model.layers[-3].output]
+    inception_v1_model.layers[-3].outbound_nodes = []
+    inception_v1_model.layers.pop()
+    inception_v1_model.outputs = [inception_v1_model.layers[-4].output]
+    inception_v1_model.layers[-4].outbound_nodes = []
+
+
+    inception_v1_model.summary()
+
     model = keras.Sequential()
+
     model.add(inception_v1_model)
     model.add(keras.layers.GlobalAveragePooling2D())
     model.add(keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'))

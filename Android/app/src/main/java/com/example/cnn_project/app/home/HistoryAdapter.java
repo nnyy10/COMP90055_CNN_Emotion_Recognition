@@ -1,7 +1,5 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.home;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.FragmentManager;
-
-import com.google.firebase.storage.StorageReference;
+import com.example.cnn_project.R;
+import com.example.cnn_project.object.History;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -55,7 +52,7 @@ public class HistoryAdapter extends ArrayAdapter<History> {
         result_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragment_result resultFragment = new fragment_result(history.image_location, history.facesSnapshot);
+                ResultFragment resultFragment = new ResultFragment(history.image_location, history.facesSnapshot);
                 context.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, resultFragment).commit();
             }
         });

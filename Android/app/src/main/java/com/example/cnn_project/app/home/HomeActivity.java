@@ -1,4 +1,4 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.home;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.cnn_project.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -19,7 +20,7 @@ public class HomeActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new fragment_home()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
@@ -29,16 +30,16 @@ public class HomeActivity extends AppCompatActivity {
                     Fragment selectedFragment = null;
                     switch (item.getItemId()) {
                         case R.id.nav_home:
-                            selectedFragment = new fragment_home();
+                            selectedFragment = new HomeFragment();
                             break;
                         case R.id.nav_upload:
-                            selectedFragment = new fragment_upload();
+                            selectedFragment = new UploadFragment();
                             break;
                         case R.id.nav_history:
-                            selectedFragment = new fragment_history();
+                            selectedFragment = new HistoryFragment();
                             break;
                         case R.id.nav_profile:
-                            selectedFragment = new fragment_profile();
+                            selectedFragment = new ProfileFragment();
                             break;
                     }
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
