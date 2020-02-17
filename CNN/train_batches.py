@@ -18,9 +18,10 @@ from sklearn.utils import class_weight
 BATCH_SIZE = 64
 EPOCH = 30
 # OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
-OPTIMIZER = "adadelta"
+# OPTIMIZER = "adadelta"
+OPTIMIZER = keras.optimizers.adadelta(10)
 # LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
-LOSS_FUNCTION = tf.keras.losses.hinge
+LOSS_FUNCTION = tf.keras.losses.squared_hinge
 SAVE_MODEL = True
 LOG = True
 PLOT_TRAINING_HISTORY = False
@@ -51,7 +52,7 @@ print("done \n")
 # DATA_SET_NAME = DATA_SET_LIST[0]
 DATA_SET_NAME = "kac"
 # if you wish to give the model an ID
-MODEL_NAME_ID = "valot"
+MODEL_NAME_ID = "valot3"
 
 IMG_SIZE = (160, 160)
 
@@ -59,15 +60,14 @@ IMG_SIZE = (160, 160)
 # ----------------------------------------------------------------------------
 """Load data"""
 print('creating data generator')
-# train_datagen = ImageDataGenerator(rescale=1. / 255,
-#                                    rotation_range=45,
-#                                    width_shift_range=0.2,
-#                                    height_shift_range=0.2,
-#                                    brightness_range=[0.5, 1.5],
-#                                    shear_range=0.2,
-#                                    zoom_range=0.2,
-#                                    horizontal_flip=True)
-train_datagen = ImageDataGenerator(rescale=1. / 255)
+train_datagen = ImageDataGenerator(rescale=1. / 255,
+                                   rotation_range=10,
+                                   width_shift_range=0.1,
+                                   height_shift_range=0.2,
+                                   brightness_range=[0.7, 1.3],
+                                   shear_range=0.1,
+                                   horizontal_flip=True)
+# train_datagen = ImageDataGenerator(rescale=1. / 255)
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 

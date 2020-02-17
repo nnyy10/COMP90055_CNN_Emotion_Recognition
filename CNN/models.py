@@ -8,6 +8,8 @@ def pretrained_facenet_inception_v1(print_summary=False):
     inception_v1_model = keras.models.load_model(model_dir)
     model = keras.Sequential()
     model.add(inception_v1_model)
+    model.add(keras.layers.GlobalAveragePooling2D())
+    model.add(keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'))
     model.add(keras.layers.Dense(7, activation='softmax'))
     if print_summary:
         print(model.summary())
@@ -20,7 +22,7 @@ def pretrained_facenet_inception_v1_svm(print_summary=False):
     model = keras.Sequential()
     model.add(inception_v1_model)
     model.add(keras.layers.Dense(7, kernel_regularizer=l2(0.01)))
-    model.add(keras.layers.Activation('linear'))
+    model.add(keras.layers.Activation('softmax'))
     if print_summary:
         print(model.summary())
     return model
