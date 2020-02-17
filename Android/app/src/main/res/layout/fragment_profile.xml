@@ -5,10 +5,11 @@
 
     <TextView
         android:id="@+id/email_profile"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:textSize="30dp"
-        android:layout_marginLeft="10dp"
+        android:text="Email"
         android:layout_above="@+id/logout"/>
 
     <Button
@@ -17,6 +18,9 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginTop="30dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/button_background"
+        android:textColor="@color/bgColor_alertview_alert_start"
         android:text="Log out"/>
 
 </RelativeLayout>
