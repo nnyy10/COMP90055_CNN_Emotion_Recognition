@@ -9,49 +9,76 @@ from models import *
 from keras.preprocessing.image import ImageDataGenerator
 import logging
 import os
+from collections import Counter
+from sklearn.utils import class_weight
 
 
 # ----------------------------------------------------------------------------
 """Set training parameters"""
 BATCH_SIZE = 64
-EPOCH = 1
-OPTIMIZER = keras.optimizers.Adam(lr=0.0001)
-LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
+EPOCH = 30
+# OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
+OPTIMIZER = "adadelta"
+# LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
+LOSS_FUNCTION = tf.keras.losses.hinge
 SAVE_MODEL = True
 LOG = True
 PLOT_TRAINING_HISTORY = False
+# # CLASS_WEIGHT = {0:}
+y = np.concatenate((np.zeros(74374),
+                   np.ones(133915),
+                   np.ones(24959)*2,
+                   np.ones(13590)*3,
+                   np.ones(5878)*4,
+                   np.ones(3303)*5,
+                   np.ones(24382)*6))
+
+
+class_weights = class_weight.compute_class_weight('balanced', np.array([0, 1, 2, 3, 4, 5, 6]), y)
+# class_weights_dict = {}
+# for i in range(7):
+#     class_weights_dict[i] = class_weights[i]
+
+print(class_weights)
 
 print("loading model...")
-model_initializer = pretrained_mobilenet
-model = model_initializer(print_summary=False)
+model_initializer = pretrained_facenet_inception_v1_svm
+model = model_initializer(print_summary=True)
 print("done \n")
 
 # ka = kaggle, uc = uncropped
-DATA_SET_NAME = "KAC"
+# DATA_SET_LIST = ["blackwhite_original", "blackwhite_reduced", "colored_original", "colored_reduced"]
+# DATA_SET_NAME = DATA_SET_LIST[0]
+DATA_SET_NAME = "kac"
 # if you wish to give the model an ID
-MODEL_NAME_ID = ""
+MODEL_NAME_ID = "valot"
 
-IMG_SIZE = (48, 48)
+IMG_SIZE = (160, 160)
 
 
 # ----------------------------------------------------------------------------
 """Load data"""
 print('creating data generator')
-train_datagen = ImageDataGenerator(rescale=1. / 255,
-                                   rotation_range=45,
-                                   width_shift_range=0.2,
-                                   height_shift_range=0.2,
-                                   brightness_range=[0.7, 1.3],
-                                   shear_range=0.2,
-                                   zoom_range=0.2,
-                                   horizontal_flip=True)
-# train_datagen = ImageDataGenerator(rescale=1. / 255)
+# train_datagen = ImageDataGenerator(rescale=1. / 255,
+#                                    rotation_range=45,
+#                                    width_shift_range=0.2,
+#                                    height_shift_range=0.2,
+#                                    brightness_range=[0.5, 1.5],
+#                                    shear_range=0.2,
+#                                    zoom_range=0.2,
+#                                    horizontal_flip=True)
+train_datagen = ImageDataGenerator(rescale=1. / 255)
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 TRAIN_DIR = "data/processed_data/cropped_img/train"
 VALID_DIR = "data/processed_data/cropped_img/valid"
 TEST_DIR = "data/processed_data/cropped_img/test"
+# DATA_DIR = "C:\\Users\\naiyu\\Documents\\Naiyun\\ProcessedData"
+# TRAIN_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "train")
+# VALID_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "valid")
+# TEST_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "test")
+
 train_generator = train_datagen.flow_from_directory(
     TRAIN_DIR,
     target_size=IMG_SIZE,
@@ -73,6 +100,7 @@ model.compile(optimizer=OPTIMIZER, metrics=['accuracy'], loss=LOSS_FUNCTION)
 print('done \n')
 
 print('fitting model... ')
+# history = model.fit_generator(train_generator, epochs=EPOCH, verbose=1, validation_data=validation_generator, class_weight=class_weights)
 history = model.fit_generator(train_generator, epochs=EPOCH, verbose=1, validation_data=validation_generator)
 print('done \n')
 
@@ -85,13 +113,9 @@ print("done \n")
 print("Test loss and accuracy: ", test_result, "\n")
 
 
-print("evaluating training loss and accuracy...")
-train_result = model.evaluate_generator(train_generator)
-print("done \n")
-
-
 # ----------------------------------------------------------------------------
 """Saving model and logging"""
+print("Saving model and logging...")
 MODEL_NAME = "DA{0}_BS{1}_EP{2}_OP{3}_LO{4}_MO{5}_TRA{6}_TEA{7}{8}_WA".format(DATA_SET_NAME,
                                                                                           str(int(BATCH_SIZE)),
                                                                                           str(int(EPOCH)),
@@ -99,7 +123,7 @@ MODEL_NAME = "DA{0}_BS{1}_EP{2}_OP{3}_LO{4}_MO{5}_TRA{6}_TEA{7}{8}_WA".format(DA
                                                                                           LOSS_FUNCTION.__name__,
                                                                                           model_initializer.__name__,
                                                                                           str(int(
-                                                                                              train_result[1] * 100)),
+                                                                                              history.history['accuracy'][-1] * 100)),
                                                                                           str(int(
                                                                                               test_result[1] * 100)),
                                                                                           MODEL_NAME_ID)
@@ -119,8 +143,8 @@ if LOG:
     logging.info("Optimizer: " + OPTIMIZER.__class__.__name__)
     logging.info("Loss Function: " + LOSS_FUNCTION.__name__)
     logging.info("Base Model: " + LOSS_FUNCTION.__name__)
-    logging.info("Train Accuracy: " + str(int(train_result[1] * 100)))
-    logging.info("Test Accuracy: " + str(int(test_result[1] * 100)))
+    logging.info("Train Accuracy: " + str(round(history.history['accuracy'][-1] * 100, 2)))
+    logging.info("Test Accuracy: " + str(round(test_result[1] * 100, 2)))
     logging.info("Train Accuracy History: " + str([round(x*100, 2) for x in history.history['accuracy']]))
     logging.info("Validation Accuracy History: " + str([round(x*100, 2) for x in history.history['val_accuracy']]))
     logging.info("Train Loss History: " + str([round(x, 4) for x in history.history['loss']]))
