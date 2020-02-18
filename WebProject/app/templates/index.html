@@ -177,7 +177,6 @@
                     xhr.onloadend = function () {
                         var result = JSON.parse(xhr.response);
                         if (result["found"] == true){
-                            {#document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";#}
                             document.getElementById("result_str").innerHTML = ""
                             document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
                             face_list = result["faces"]
@@ -203,8 +202,10 @@
                                 node.appendChild(textnode);
                                 document.getElementById("face_list").appendChild(node);
                             }
-                        }else
-                            document.getElementById("result_str").innerHTML = "No face detected, try another image";
+                        }else{
+                            document.getElementById("result_str").innerHTML = "";
+                            alert("No face detected, try another image!");
+                        }
                     };
                 });
                 FR.readAsDataURL(photo);

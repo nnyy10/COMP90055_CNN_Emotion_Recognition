@@ -32,8 +32,8 @@ def crop_face_single(pixel_array, resize=True):
         x_start = 0
     if y_end > y-1:
         y_end = y-1
-    if x_end > y-1:
-        x_end = y-1
+    if x_end > x-1:
+        x_end = x-1
     crop_img = pixel_array[y_start:y_end, x_start:x_end]
 
     if resize:
@@ -43,8 +43,23 @@ def crop_face_single(pixel_array, resize=True):
 
 
 def process_face(image, face, size):
+
     box_x, box_y, box_w, box_h = getxywh(face)
-    cropped_face = image[box_y:box_y + box_h, box_x:box_x + box_w]
+    y, x, z = image.shape
+    y_start = box_y
+    y_end = box_y + box_h
+    x_start = box_x
+    x_end = box_x + box_w
+    if y_start < 0:
+        y_start = 0
+    if x_start < 0:
+        x_start = 0
+    if y_end > y-1:
+        y_end = y-1
+    if x_end > x-1:
+        x_end = x-1
+
+    cropped_face = image[y_start:y_end, x_start:x_end]
     processed_face = cv2.cvtColor(cropped_face, cv2.COLOR_RGB2GRAY)
     processed_face = cv2.resize(processed_face, size)
     processed_face = np.true_divide(processed_face, 255)

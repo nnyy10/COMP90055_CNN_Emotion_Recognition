@@ -135,7 +135,7 @@
             xhr.onloadend = function () {
                 var result = JSON.parse(xhr.response);
                 if (result["found"] == true){
-                    document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
+                    document.getElementById("result_str").innerHTML = ""
                     document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
                     face_list = result["faces"]
                     for(i = 0; i < face_list.length; i++){
@@ -147,18 +147,23 @@
                         else
                             var emotion_text = "  Emotion Probabilities: ";
                         img_node.src = img_split[0].concat(",",json_face["face"]);
+                        img_node.style.height = '70px';
+                        img_node.style.width = '50px';
                         emotion_predictions = json_face["prediction"];
 
                         for (j = 0; j < emotion_predictions.length; j++)
                             emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
                         emotion_text = emotion_text.slice(0, -2);
                         var textnode = document.createTextNode(emotion_text);
+                        {#textnode.style.textAlign = "top";#}
                         node.appendChild(img_node);
                         node.appendChild(textnode);
                         document.getElementById("face_list").appendChild(node);
                     }
-                }else
-                    document.getElementById("result_str").innerHTML = "No face detected, try another image";
+                }else{
+                    document.getElementById("result_str").innerHTML = "";
+                    alert("No face detected, try another image!");
+                }
             };
         });
         FR.readAsDataURL(photo);
