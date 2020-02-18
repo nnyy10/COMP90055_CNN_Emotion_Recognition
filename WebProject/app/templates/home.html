@@ -1,6 +1,5 @@
 {%extends "base.html"%}
 
-
 {% block title %}
 <title>CNN Face Emotion Detection</title>
 <style type="text/css">
@@ -18,6 +17,11 @@
             height: 750px;
             width: 1200px;
             margin-top: 50px;}
+        img{
+            width: 150px;
+            height: 180px;
+            margin-right: 30px;
+        }
         li{
             margin-top: 10px;
             margin-bottom: 20px;
@@ -25,95 +29,74 @@
             margin-left: 0px;
         }
 
-
 </style>
 {% endblock title %}
 
 {%block main%}
+    <div class="container" style="width: 1170px">
+        <h3>Welcome {{ session.get('email') }}! <br></h3>
+        <hr>
+        Human emotion detection is the process of identifying human emotions from a picture. On this website, you can upload an image and we will first use a face detection algorithm to determine if there is a face(s) present or not and if there is, make a one of 7 emotion predictions: Angry, Happy, Sad, Neutral, Disgust, Surprise and Fear as well as a percentage indicating how certain the algorithm is on the prediction. The predictions are made with convolutional neural networks (CNN) which is currently the state of the art in image processing. The three models that are used are Inception-ResNetV1, MobileNet and Yolo3 and each having an accuracy of 69%, 67% and 48% respectively. In comparison, humans have an accuracy of 68 +- 5% when it comes to emotion prediction from faces.
+        <hr>
+        You can go to the
+        <a href="{{ url_for('upload') }}"> Upload</a>
+        page to start predicting images or try to the real time predicting system by going to the
+        <a href="{{ url_for('camera') }}"> Camera</a>
+        page. Finally, you can see a history of all your previous predictions in the
+        <a href="{{ url_for('history') }}"> History</a>
+        page.
+        <hr>
+        Have fun predicting!
+        <hr>
+        To read a detailed description of this system, please go to the
+        <a href="{{ url_for('aboutUs') }}"> About</a>
+        page.
+        <hr>
 
-<div class="container">
-    <h3>Welcome {{ session.get('email') }}! <br></h3>
-
-    <div class="row" style="margin-left: 0px">
-        <div class="col">
-            <h3>Please select the model you wish to use</h3>
-            <input type="radio" id="inception-resnet" name="model_radio" value="inception-resnet" checked>
-            <label for="inception-resnet">inception-resnet</label>
-            <input type="radio" id="mobilenetv2" name="model_radio" value="mobilenetv2">
-            <label for="mobilenetv2">mobilenetv2</label>
-            <input type="radio" id="yolo3" name="model_radio" value="yolo3">
-            <label for="yolo3">yolo3</label>
-            <h3>Please select an image</h3>
-            <hr>
-            <form onsubmit="callPredictUploadAPI()" id="myAnchor">
-                <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">
-            </form>
-
-            <script>
-            document.getElementById("myAnchor").addEventListener("submit", function(event){
-                event.preventDefault()
-            });
-
-            function callPredictUploadAPI() {
-                document.getElementById("face_list").innerHTML = "";
-                document.getElementById("full_img").src="";
-                document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
-
-                let photo = document.getElementById("input2").files[0];
-
-                var FR= new FileReader();
-                FR.addEventListener("load", function(e) {
-                    var img_split = e.target.result.split(",");
-                    var base64_img = img_split[1];
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", "/predict_upload_api", true);
-                    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-                    var model = document.querySelector('input[name="model_radio"]:checked').value;
-                    xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name, "model":model}));
-
-                    xhr.onloadend = function () {
-                        var result = JSON.parse(xhr.response);
-                        if (result["found"] == true){
-                            document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
-                            document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
-                            face_list = result["faces"]
-                            for(i = 0; i < face_list.length; i++){
-                                var node = document.createElement("LI");
-                                var img_node = document.createElement('img');
-                                var json_face = result["faces"][i];
-                                if(model.localeCompare("yolo3") == 0)
-                                    var emotion_text = "  Emotion score: ";
-                                else
-                                    var emotion_text = "  Emotion Probabilities: ";
-                                img_node.src = img_split[0].concat(",",json_face["face"]);
-                                emotion_predictions = json_face["prediction"];
-
-                                for (j = 0; j < emotion_predictions.length; j++)
-                                    emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
-                                emotion_text = emotion_text.slice(0, -2);
-                                var textnode = document.createTextNode(emotion_text);
-                                node.appendChild(img_node);
-                                node.appendChild(textnode);
-                                document.getElementById("face_list").appendChild(node);
-                            }
-                        }else
-                            document.getElementById("result_str").innerHTML = "No face detected, try another image";
-                    };
-                });
-                FR.readAsDataURL(photo);
-            }
-            </script>
-            <hr>
-            <h3>Result</h3>
-            <p id="result_str"></p>
-            <img src="#" id="full_img" alt="">
-            <hr>
-            <ol id="face_list">
-            </ol>
+        <div id="butong_net_left" style="overflow:hidden;width: 1170px;height: 200px">
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td id="butong_net_left1" valign="top" align="center">
+                        <table cellpadding="2" cellspacing="0" border="0">
+                            <tr align="center">
+                                <td><img src="../static/img/happy.png"></td>
+                                <td><img src="../static/img/neutral.png"></td>
+                                <td><img src="../static/img/angry.png"></td>
+                                <td><img src="../static/img/surprise.png"></td>
+                                <td><img src="../static/img/fear.png"></td>
+                                <td><img src="../static/img/sad.png"></td>
+                                <td><img src="../static/img/disgust.png"></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td id="butong_net_left2" valign="top"></td>
+                </tr>
+            </table>
         </div>
+
+        <script>
+            window.onload=function(){
+                var oDiv  =  document.getElementById('butong_net_left');
+                var speed=10
+                butong_net_left2.innerHTML=butong_net_left1.innerHTML
+                function Marquee3(){
+                    if(butong_net_left2.offsetWidth-butong_net_left.scrollLeft<=0)
+                        butong_net_left.scrollLeft-=butong_net_left1.offsetWidth
+                    else{
+                        butong_net_left.scrollLeft++
+                    }
+                }
+                var MyMar3 = setInterval(Marquee3,speed)
+                oDiv.onmouseover = function(){
+                    clearInterval(MyMar3);
+                }
+                oDiv.onmouseout = function () {
+                    MyMar3 = setInterval(Marquee3,speed)
+                }
+            }
+
+        </script>
+
     </div>
-</div>
 
 {%endblock main%}
