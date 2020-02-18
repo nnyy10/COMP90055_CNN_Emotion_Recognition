@@ -87,7 +87,7 @@
             <div class="first">
                 <h3>Please select an image</h3>
                 <hr>
-                <form onsubmit="callPredictAPI()" id="myAnchor">
+                <form onsubmit="callPredictUploadAPI()" id="myAnchor">
                     <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">
                 </form>
                 <hr>
@@ -108,79 +108,61 @@
 
     </div>
 
+    <script>
+    document.getElementById("myAnchor").addEventListener("submit", function(event){
+        event.preventDefault()
+    });
 
+    function callPredictUploadAPI() {
+        document.getElementById("face_list").innerHTML = "";
+        document.getElementById("full_img").src="";
+        document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
 
+        let photo = document.getElementById("input2").files[0];
 
-{#    <div class="row" style="margin-left: 0px">#}
-{#        <div class="col">#}
-{#            <h3>Please select the model you wish to use</h3>#}
-{#            <input type="radio" id="inception-resnet" name="model_radio" value="inception-resnet" checked>#}
-{#            <label for="inception-resnet">inception-resnet</label>#}
-{#            <input type="radio" id="mobilenetv2" name="model_radio" value="mobilenetv2">#}
-{#            <label for="mobilenetv2">mobilenetv2</label>#}
-{#            <input type="radio" id="yolo3" name="model_radio" value="yolo3">#}
-{#            <label for="yolo3">yolo3</label>#}
-{#            <h3>Please select an image</h3>#}
-{#            <hr>#}
-{#            <form onsubmit="callPredictUploadAPI()" id="myAnchor">#}
-{#                <input id="input2" name="input2" type="file" class="file" multiple="false" accept="image/*">#}
-{#            </form>#}
+        var FR= new FileReader();
+        FR.addEventListener("load", function(e) {
+            var img_split = e.target.result.split(",");
+            var base64_img = img_split[1];
 
-            <script>
-            document.getElementById("myAnchor").addEventListener("submit", function(event){
-                event.preventDefault()
-            });
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/predict_upload_api", true);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
-            function callPredictUploadAPI() {
-                document.getElementById("face_list").innerHTML = "";
-                document.getElementById("full_img").src="";
-                document.getElementById("result_str").innerHTML = "Please wait while your image is being processed..."
+            var model = document.querySelector('input[name="model_radio"]:checked').value;
+            xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name, "model":model}));
 
-                let photo = document.getElementById("input2").files[0];
+            xhr.onloadend = function () {
+                var result = JSON.parse(xhr.response);
+                if (result["found"] == true){
+                    document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
+                    document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
+                    face_list = result["faces"]
+                    for(i = 0; i < face_list.length; i++){
+                        var node = document.createElement("LI");
+                        var img_node = document.createElement('img');
+                        var json_face = result["faces"][i];
+                        if(model.localeCompare("yolo3") == 0)
+                            var emotion_text = "  Emotion score: ";
+                        else
+                            var emotion_text = "  Emotion Probabilities: ";
+                        img_node.src = img_split[0].concat(",",json_face["face"]);
+                        emotion_predictions = json_face["prediction"];
 
-                var FR= new FileReader();
-                FR.addEventListener("load", function(e) {
-                    var img_split = e.target.result.split(",");
-                    var base64_img = img_split[1];
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", "/predict_upload_api", true);
-                    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-                    var model = document.querySelector('input[name="model_radio"]:checked').value;
-                    xhr.send(JSON.stringify({"image":base64_img, "img_name": photo.name, "model":model}));
-
-                    xhr.onloadend = function () {
-                        var result = JSON.parse(xhr.response);
-                        if (result["found"] == true){
-                            document.getElementById("result_str").innerHTML = "Face(s) detected! Scroll down to see more details.";
-                            document.getElementById("full_img").src =  img_split[0].concat(",",result["image"]);
-                            face_list = result["faces"]
-                            for(i = 0; i < face_list.length; i++){
-                                var node = document.createElement("LI");
-                                var img_node = document.createElement('img');
-                                var json_face = result["faces"][i];
-                                if(model.localeCompare("yolo3") == 0)
-                                    var emotion_text = "  Emotion score: ";
-                                else
-                                    var emotion_text = "  Emotion Probabilities: ";
-                                img_node.src = img_split[0].concat(",",json_face["face"]);
-                                emotion_predictions = json_face["prediction"];
-
-                                for (j = 0; j < emotion_predictions.length; j++)
-                                    emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
-                                emotion_text = emotion_text.slice(0, -2);
-                                var textnode = document.createTextNode(emotion_text);
-                                node.appendChild(img_node);
-                                node.appendChild(textnode);
-                                document.getElementById("face_list").appendChild(node);
-                            }
-                        }else
-                            document.getElementById("result_str").innerHTML = "No face detected, try another image";
-                    };
-                });
-                FR.readAsDataURL(photo);
-            }
-            </script>
+                        for (j = 0; j < emotion_predictions.length; j++)
+                            emotion_text = emotion_text.concat(emotion_predictions[j]["emotion"], ": ", emotion_predictions[j]["probability"], ", ");
+                        emotion_text = emotion_text.slice(0, -2);
+                        var textnode = document.createTextNode(emotion_text);
+                        node.appendChild(img_node);
+                        node.appendChild(textnode);
+                        document.getElementById("face_list").appendChild(node);
+                    }
+                }else
+                    document.getElementById("result_str").innerHTML = "No face detected, try another image";
+            };
+        });
+        FR.readAsDataURL(photo);
+    }
+    </script>
 
 {%endblock main%}

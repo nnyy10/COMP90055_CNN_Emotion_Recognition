@@ -185,13 +185,6 @@ def home():
     return ASK_LOGIN_TEXT
 
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    if 'email' in session:
-        return render_template('upload.html', username=session.get('email'))
-    return ASK_LOGIN_TEXT
-
-
 @app.route('/camera', methods=['GET', 'POST'])
 def camera():
     if 'email' in session:
@@ -210,7 +203,6 @@ def history():
     return ASK_LOGIN_TEXT
 
 
-
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'email' in session:
@@ -224,9 +216,6 @@ def profile():
         return render_template('profile.html', email=email, count=count)
     return ASK_LOGIN_TEXT
 
-@app.route('/aboutUs', methods=['GET', 'POST'])
-def aboutUs():
-    return render_template('aboutUs.html')
 
 @app.route('/logout')
 def logout():
@@ -236,6 +225,44 @@ def logout():
         session.pop('user_id', None)
         return redirect(url_for('login'))
     return ASK_LOGIN_TEXT
+
+
+# @app.route('/upload', methods=['GET', 'POST'])
+# def upload():
+#     if 'email' in session:
+#         # if request.method == 'POST':
+#         #     file = request.files['input1']
+#         #
+#         #     # # read image file string data
+#         #     # filestr = file.read()
+#         #     # # convert string data to numpy array
+#         #     # npimg = np.fromstring(filestr, np.uint8)
+#         #     # # convert numpy array to image
+#         #     # img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+#         #
+#         #     if file and allowed_image(file.filename):
+#         #         image = storage.child('upload/' + session.get('user_id') + '/' + randomString())
+#         #         image.put(file)
+#         #         image_location = storage.child('upload/' + session.get('user_id') + '/' + file.filename).get_url(None)
+#         #         time = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+#         #         # result = predict_picture.predict(img)
+#         #         result="happy"
+#         #         # if result is None:
+#         #         #     pass
+#         #         # else:
+#         #         #     pass
+#         #         #
+#         #         database.child('users/' + session.get('user_id')).push({"image_name": file.filename,
+#         #                                                                              "image_location": image_location,
+#         #                                                                              "submit_time": time,
+#         #                                                                              "result": result})
+#         #         flash('Successful upload image!')
+#         #         return render_template('upload.html', result=result)
+#         #     else:
+#         #         flash('Error: upload failed!')
+#         return render_template('upload.html')
+#     return "You must be logged in to access this page!<br><a href = '/login'></b>" + "click here to log in</b></a>"
+
 
 
 if __name__ == '__main__':
