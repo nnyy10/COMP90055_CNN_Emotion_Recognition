@@ -10,7 +10,7 @@ import cv2
 import random
 import string
 
-emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+emotions = ["Angry", "Disgust", "Fear", "Happy", "Neutral", "Sad", "Surprise"]
 
 
 def emotion_int_to_str(emotion_int):
@@ -26,11 +26,11 @@ def emotion_str_to_int(emotion_str):
         return 2
     elif emotion_str.lower() == "happy":
         return 3
-    elif emotion_str.lower() == "sad":
-        return 4
-    elif emotion_str.lower() == "surprise":
-        return 5
     elif emotion_str.lower() == "neutral":
+        return 4
+    elif emotion_str.lower() == "sad":
+        return 5
+    elif emotion_str.lower() == "surprise":
         return 6
     else:
         return None
