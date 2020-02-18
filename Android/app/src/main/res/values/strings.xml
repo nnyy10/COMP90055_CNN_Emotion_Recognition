@@ -1,6 +1,16 @@
 <resources>
-    <string name="app_name">CNN_Project</string>
+    <string name="app_name">Emotion Detection CNN</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home_app_title">About this app</string>
+    <string name="home_app_description">
+        You can go to the “upload” tab to start predicting images or view a history of all
+        your previous predictions in the “history” tab. The app willmake a one of 7 emotion predictions:
+        Angry, Happy, Sad, Neutral, Disgust, Surprise and Fear and a certainty. The predictions are made with convolutional
+        neural networks which is currently the state of the art in image processing. The three
+        models that are used are Inception-ResNetV1, MobileNet and Yolo3 and each having an accuracy
+        of 69%, 67% and 48% respectively. In comparison, humans have an accuracy of 68 +- 5% when it
+        comes to emotion prediction from faces according to one study.
+        \n\nHave fun predicting!</string>
 </resources>

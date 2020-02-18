@@ -7,12 +7,11 @@
     android:layout_margin="15dp"
     android:orientation="vertical">
 
-<!--    <com.example.cnn_project.ZoomableImageView-->
-    <ImageView
+    <com.example.cnn_project.ZoomableImageView
         android:id="@+id/imageView_response_image"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        />
+        android:layout_marginBottom="10dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/faceRecyclerView"
@@ -22,28 +21,3 @@
         android:focusable="true" />
 
 </LinearLayout>
-
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    tools:context=".fragment_response"-->
-<!--    android:orientation="vertical">-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/imageView_reponse_image"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content" />-->
-
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="0dp"-->
-<!--        android:layout_marginTop="0dp"-->
-<!--        android:clickable="true"-->
-<!--        android:id="@+id/faceRecyclerView"-->
-<!--        android:focusable="true" />-->
-
-<!--</RelativeLayout>-->

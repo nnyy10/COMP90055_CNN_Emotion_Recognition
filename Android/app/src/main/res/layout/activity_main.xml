@@ -15,6 +15,6 @@
 <!--        android:id="@+id/camera_fragment"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="match_parent"-->
-<!--        android:name="com.example.cnn_project.fragment_camera"/>-->
+<!--        android:name="com.example.cnn_project.app.initial.InitialFragment"/>-->
 
 </LinearLayout>

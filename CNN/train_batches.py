@@ -16,12 +16,11 @@ from sklearn.utils import class_weight
 # ----------------------------------------------------------------------------
 """Set training parameters"""
 BATCH_SIZE = 64
-EPOCH = 30
-# OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
+EPOCH = 50
+OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
 # OPTIMIZER = "adadelta"
-OPTIMIZER = keras.optimizers.adadelta(10)
-# LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
-LOSS_FUNCTION = tf.keras.losses.squared_hinge
+LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
+# LOSS_FUNCTION = tf.keras.losses.squared_hinge
 SAVE_MODEL = True
 LOG = True
 PLOT_TRAINING_HISTORY = False
@@ -43,7 +42,7 @@ class_weights = class_weight.compute_class_weight('balanced', np.array([0, 1, 2,
 print(class_weights)
 
 print("loading model...")
-model_initializer = pretrained_facenet_inception_v1_svm
+model_initializer = pretrained_facenet_inception_v1
 model = model_initializer(print_summary=True)
 print("done \n")
 
@@ -61,11 +60,12 @@ IMG_SIZE = (160, 160)
 """Load data"""
 print('creating data generator')
 train_datagen = ImageDataGenerator(rescale=1. / 255,
-                                   rotation_range=10,
-                                   width_shift_range=0.1,
+                                   rotation_range=45,
+                                   width_shift_range=0.2,
                                    height_shift_range=0.2,
-                                   brightness_range=[0.7, 1.3],
-                                   shear_range=0.1,
+                                   brightness_range=[0.5, 1.5],
+                                   shear_range=0.2,
+                                   zoom_range=0.2,
                                    horizontal_flip=True)
 # train_datagen = ImageDataGenerator(rescale=1. / 255)
 

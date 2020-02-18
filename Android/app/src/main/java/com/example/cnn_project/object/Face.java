@@ -1,4 +1,4 @@
-package com.example.cnn_project;
+package com.example.cnn_project.object;
 
 
 import org.json.JSONObject;

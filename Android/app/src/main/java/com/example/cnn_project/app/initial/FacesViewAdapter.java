@@ -1,4 +1,4 @@
-package com.example.cnn_project;
+package com.example.cnn_project.app.initial;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -8,10 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.cnn_project.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
