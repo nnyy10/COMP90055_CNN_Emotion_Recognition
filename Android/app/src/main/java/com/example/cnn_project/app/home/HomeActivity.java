@@ -1,5 +1,6 @@
 package com.example.cnn_project.app.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.cnn_project.R;
+import com.example.cnn_project.app.initial.UploadFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
@@ -42,9 +44,26 @@ public class HomeActivity extends AppCompatActivity {
                             selectedFragment = new ProfileFragment();
                             break;
                     }
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, selectedFragment)
+                            .addToBackStack(null)
+                            .commit();
                     return true;
                 }
             };
 
+    @Override
+    public void onBackPressed(){
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        if (fragment instanceof HomeFragment || fragment instanceof UploadFragment
+        || fragment instanceof  ProfileFragment || fragment instanceof  HistoryFragment) {
+            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+            homeIntent.addCategory( Intent.CATEGORY_HOME );
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(homeIntent);
+        } else
+            super.onBackPressed();
+    }
 }

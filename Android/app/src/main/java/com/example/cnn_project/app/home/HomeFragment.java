@@ -24,13 +24,15 @@ public class HomeFragment extends Fragment {
         int duration = 3500;
         int fade_duration = 2500;
         AnimationDrawable animation = new AnimationDrawable();
+        animation.addFrame(getResources().getDrawable(R.drawable.happy), duration);
+        animation.addFrame(getResources().getDrawable(R.drawable.neutral), duration);
+        animation.addFrame(getResources().getDrawable(R.drawable.surprise), duration);
         animation.addFrame(getResources().getDrawable(R.drawable.angry), duration);
         animation.addFrame(getResources().getDrawable(R.drawable.disgust), duration);
         animation.addFrame(getResources().getDrawable(R.drawable.fear), duration);
-        animation.addFrame(getResources().getDrawable(R.drawable.happy), duration);
         animation.addFrame(getResources().getDrawable(R.drawable.sad), duration);
-        animation.addFrame(getResources().getDrawable(R.drawable.neutral), duration);
-        animation.addFrame(getResources().getDrawable(R.drawable.surprise), duration);
+
+
         animation.setOneShot(false);
         animation.setEnterFadeDuration(fade_duration);
         ImageView imageAnim = view.findViewById(R.id.imageView);

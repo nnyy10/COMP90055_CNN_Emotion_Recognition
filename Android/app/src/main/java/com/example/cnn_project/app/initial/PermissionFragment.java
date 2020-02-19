@@ -23,13 +23,5 @@ public class PermissionFragment extends Fragment {
         }
     }
 
-    public int verifyPermissions(Activity activity, java.lang.String permission) {
-        int Permission = ActivityCompat.checkSelfPermission(activity,permission);
-        if (Permission == PackageManager.PERMISSION_GRANTED) {
-            return 1;
-        }else{
-            return 0;
-        }
-    }
 }
 

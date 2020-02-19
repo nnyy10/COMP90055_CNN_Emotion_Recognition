@@ -1,5 +1,6 @@
 package com.example.cnn_project.app.authentication;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,8 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.cnn_project.app.home.HomeActivity;
 import com.example.cnn_project.R;
+import com.example.cnn_project.app.home.HomeActivity;
+import com.example.cnn_project.app.initial.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseTooManyRequestsException;
@@ -31,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,10 +80,13 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Please enter password!", Toast.LENGTH_SHORT).show();
                 password_Login.requestFocus();
             } else {
+                progressDialog = ProgressDialog.show(LoginActivity.this, "",
+                        "Authenticating, please wait...", true);
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(!task.isSuccessful()){
+                            progressDialog.dismiss();
                             try {
                                 throw task.getException();
                             } catch(FirebaseAuthInvalidCredentialsException e) {
@@ -97,6 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                             }
                         } else{
+                            progressDialog.dismiss();
                             Toast.makeText(LoginActivity.this, "Successful log in!", Toast.LENGTH_SHORT).show();
                             Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(homeIntent);
@@ -113,4 +121,7 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
+    public void onBackPressed() {
+        this.startActivity(new Intent(this, MainActivity.class));
+    }
 }

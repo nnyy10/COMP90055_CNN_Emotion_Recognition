@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.cnn_project.R;
-import com.example.cnn_project.ZoomableImageView;
 import com.example.cnn_project.object.Face;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -75,7 +74,7 @@ public class ResultFragment extends Fragment {
             faceList.add(faceObject);
         }
 
-        FaceResultViewAdapter adapter = new FaceResultViewAdapter(getActivity(), faceList);
+        FaceViewAdapter adapter = new FaceViewAdapter(getActivity(), faceList);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext,DividerItemDecoration.VERTICAL));

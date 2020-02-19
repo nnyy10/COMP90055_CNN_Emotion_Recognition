@@ -1,6 +1,5 @@
 package com.example.cnn_project.app.initial;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -17,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +28,7 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import com.example.cnn_project.R;
+import com.example.cnn_project.app.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,20 +46,20 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import com.example.cnn_project.app.Global;
 
-public class InitialFragment extends PermissionFragment {
-
-    private static String[] PERMISSIONS_STORAGE = {Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA};
+public class UploadFragment extends PermissionFragment {
 
     private Button choose, upload;
     private ImageView imageView;
     private Context mContext;
     private RadioButton radio_inception_resnet, radio_mobilenetv2, radio_yolo3;
 
-    private Uri fileURI;
     private String fileString;
+    private Uri tempPathUri;
+    private String tempPathString;
+
+    private ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,8 +84,6 @@ public class InitialFragment extends PermissionFragment {
 
         return view;
     }
-
-    private ProgressDialog progressDialog;
 
     private View.OnClickListener uploadListender = new View.OnClickListener() {
         @Override
@@ -115,12 +113,10 @@ public class InitialFragment extends PermissionFragment {
                             postData.put("model", model);
 
                             AsyncHttpTask task = new AsyncHttpTask();
-
-                            task.execute("http://45.113.235.79/predict_api", postData.toString());
-//                            task.execute("http://10.13.126.11:5000/predict_api", postData.toString());
-
+                            task.execute(Global.URL + Global.API_NAME, postData.toString());
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            Toast.makeText(mContext, "Error: Unable to construct out going JSON.", Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
                         }
                     }
                 };
@@ -133,29 +129,30 @@ public class InitialFragment extends PermissionFragment {
 
     private void processResponse(String response) {
         progressDialog.dismiss();
-
+        if (response == null){
+            Toast.makeText(mContext, "An error has occured. Cannot connect to the prediction server.", Toast.LENGTH_LONG).show();
+            return;
+        }
         try {
             JSONObject obj = new JSONObject(response);
-
             if((boolean) obj.get("found")) {
                 Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
-                ResponseFragment responseFragment = new ResponseFragment(obj);
+                ResultFragment resultFragment = new ResultFragment(obj);
                 getActivity()
                         .getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragment_container, responseFragment)
+                        .replace(R.id.fragment_container, resultFragment)
                         .addToBackStack(null)
                         .commit();
             }
             else if(!((boolean) obj.get("found")))
                 Toast.makeText(mContext, "No face detected in image, try another image.", Toast.LENGTH_LONG).show();
         } catch (JSONException e) {
-            e.printStackTrace();
+            Toast.makeText(mContext, "Error: Unable to parse JSON response from server.", Toast.LENGTH_LONG).show();
         }
     }
 
-    Uri tempPathUri;
-    String tempPathString;
+
     private View.OnClickListener chooseListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -202,12 +199,13 @@ public class InitialFragment extends PermissionFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_CANCELED) {
+            Uri fileURI;
             switch (requestCode) {
                 case 0:
                     if (resultCode == RESULT_OK) {
                         this.fileString = tempPathString;
                         tempPathString = "";
-                        this.fileURI = tempPathUri;
+                        fileURI = tempPathUri;
                         tempPathUri = null;
                         Bitmap bitmap = BitmapFactory.decodeFile(fileString);
                         ExifInterface ei = null;
@@ -221,26 +219,20 @@ public class InitialFragment extends PermissionFragment {
 
                         Bitmap rotatedBitmap = null;
                         switch (orientation) {
-
                             case ExifInterface.ORIENTATION_ROTATE_90:
-                                rotatedBitmap = rotateImage(bitmap, 90);
+                                rotatedBitmap = utils.rotateImage(bitmap, 90);
                                 break;
-
                             case ExifInterface.ORIENTATION_ROTATE_180:
-                                rotatedBitmap = rotateImage(bitmap, 180);
+                                rotatedBitmap = utils.rotateImage(bitmap, 180);
                                 break;
-
                             case ExifInterface.ORIENTATION_ROTATE_270:
-                                rotatedBitmap = rotateImage(bitmap, 270);
+                                rotatedBitmap = utils.rotateImage(bitmap, 270);
                                 break;
-
                             case ExifInterface.ORIENTATION_NORMAL:
                             default:
                                 rotatedBitmap = bitmap;
                         }
-
                         imageView.setImageBitmap(rotatedBitmap);
-
                     }
                     break;
                 case 1:
@@ -255,7 +247,7 @@ public class InitialFragment extends PermissionFragment {
 
                                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                                 String picturePath = cursor.getString(columnIndex);
-                                this.fileURI = Uri.parse(picturePath);
+                                fileURI = Uri.parse(picturePath);
                                 this.fileString = picturePath;
                                 imageView.setImageURI(selectedImage);
                                 cursor.close();
@@ -284,18 +276,10 @@ public class InitialFragment extends PermissionFragment {
         return image;
     }
 
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
-    }
 
     class AsyncHttpTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-
-            String data = "";
 
             HttpURLConnection httpURLConnection = null;
             try {
@@ -325,7 +309,7 @@ public class InitialFragment extends PermissionFragment {
                         return sb.toString();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                return null;
             } finally {
                 if (httpURLConnection != null) {
                     httpURLConnection.disconnect();
@@ -336,12 +320,8 @@ public class InitialFragment extends PermissionFragment {
 
         @Override
         protected void onPostExecute(String result) {
-
             processResponse(result);
-
         }
     }
-
-
 }
 

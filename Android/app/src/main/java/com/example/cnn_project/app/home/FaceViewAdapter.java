@@ -18,11 +18,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class FaceResultViewAdapter extends RecyclerView.Adapter<FaceResultViewAdapter.ViewHolder>{
+public class FaceViewAdapter extends RecyclerView.Adapter<FaceViewAdapter.ViewHolder>{
     private ArrayList facesList;
     private Activity mActivity;
 
-    public FaceResultViewAdapter(Activity context, ArrayList facesList) {
+    public FaceViewAdapter(Activity context, ArrayList facesList) {
         this.facesList = facesList;
         this.mActivity = context;
     }

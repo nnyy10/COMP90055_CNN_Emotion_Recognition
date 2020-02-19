@@ -33,18 +33,14 @@ public class ProfileFragment extends Fragment {
         View view =inflater.inflate(R.layout.fragment_profile, container,false);
         getActivity().setTitle("Profile");
         email_profile = view.findViewById(R.id.email_profile);
-//        history_profile = view.findViewById(R.id.history_profile);
         logout = view.findViewById(R.id.logout);
-
         logout.setOnClickListener(logoutListener);
 
 
         if (user != null) {
             String email = user.getEmail();
             String uid = user.getUid();
-
             email_profile.setText("Email: " + email);
-//            history_profile.setText("Count of History: " + uid);
         }
 
 
@@ -75,7 +71,6 @@ public class ProfileFragment extends Fragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //...To-do
                     }
                 });
         normalDialog.show();

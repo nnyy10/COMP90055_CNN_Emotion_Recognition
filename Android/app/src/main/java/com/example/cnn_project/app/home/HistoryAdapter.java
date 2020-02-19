@@ -53,7 +53,12 @@ public class HistoryAdapter extends ArrayAdapter<History> {
             @Override
             public void onClick(View view) {
                 ResultFragment resultFragment = new ResultFragment(history.image_location, history.facesSnapshot);
-                context.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, resultFragment).commit();
+                context
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, resultFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

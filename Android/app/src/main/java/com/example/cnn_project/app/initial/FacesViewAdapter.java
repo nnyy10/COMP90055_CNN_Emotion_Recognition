@@ -44,7 +44,7 @@ public class FacesViewAdapter extends RecyclerView.Adapter<FacesViewAdapter.View
             String textToSet = getTextForFace(predictionlist);
             holder.emotionText.setText(textToSet);
             String faceData = (String) faceList.get(position).get("face");
-            byte[] decodedString = new byte[0];
+            byte[] decodedString;
             decodedString = Base64.decode(faceData, Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             holder.faceImageView.setImageBitmap(decodedByte);

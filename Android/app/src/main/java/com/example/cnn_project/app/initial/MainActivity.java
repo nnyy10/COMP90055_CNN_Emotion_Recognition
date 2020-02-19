@@ -19,9 +19,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Fragment cameraFragment = new InitialFragment();
+        final Fragment initialFragment = new UploadFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                cameraFragment).commit();
+                initialFragment).commit();
     }
 
     @Override
@@ -38,5 +38,18 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed(){
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof UploadFragment) {
+            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+            homeIntent.addCategory( Intent.CATEGORY_HOME );
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(homeIntent);
+        } else{
+            super.onBackPressed();
+        }
     }
 }

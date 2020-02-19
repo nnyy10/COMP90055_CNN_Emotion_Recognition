@@ -1,5 +1,6 @@
 package com.example.cnn_project.app.authentication;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,9 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.cnn_project.R;
 import com.example.cnn_project.app.home.HomeActivity;
 import com.example.cnn_project.app.initial.MainActivity;
-import com.example.cnn_project.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -31,6 +32,8 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView messageTextView;
 
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +74,14 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(SignUpActivity.this, "Passwords are different!", Toast.LENGTH_SHORT).show();
                 password2_Signup.requestFocus();
             }else{
+                progressDialog = ProgressDialog.show(SignUpActivity.this, "",
+                        "Creating you account, please wait...", true);
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task task) {
                                 if (!task.isSuccessful()) {
+                                    progressDialog.dismiss();
                                     try {
                                         throw task.getException();
                                     } catch (FirebaseAuthWeakPasswordException e) {
@@ -96,6 +102,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         messageTextView.setText(msg);
                                     }
                                 } else {
+                                    progressDialog.dismiss();
                                     Toast.makeText(SignUpActivity.this, "Sign up successful!", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(SignUpActivity.this, HomeActivity.class));
                                 }
@@ -115,8 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent loginIntent = new Intent(this, MainActivity.class);
+        Intent loginIntent = new Intent(this, LoginActivity.class);
         startActivity(loginIntent);
     }
-
 }
