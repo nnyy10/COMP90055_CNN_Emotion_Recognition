@@ -44,7 +44,7 @@ def index():
 @app.route('/predict_api', methods=['GET', 'POST'])
 def predict_api():
     """
-    API which detect all faces in an image and makes a prediction of the emotion for each face.
+    REST API which detect all faces in an image and makes a prediction of the emotion for each face.
     predict_api accepts JSON as input. Input must contain:
         image: Base64 encoded image
         model: Must be one of the following: yolo3, mobilenetv2, incpetion-resnet. Defaults to inception-resnet if the
@@ -86,7 +86,7 @@ def predict_api():
 @app.route('/predict_upload_api', methods=['GET', 'POST'])
 def predict_upload_api():
     """
-    API which detect all faces in an image and makes a prediction of the emotion for each face and uploads the result
+    REST API which detect all faces in an image and makes a prediction of the emotion for each face and uploads the result
     to the user's firebase database if the user is logged in. Functions like normal predict_api if the user is not
     signed in.
     However, uploading for yolo3 model is not yet implemented.
@@ -157,7 +157,7 @@ def predict_upload_api():
 @app.route('/predict_img_only_api', methods=['GET', 'POST'])
 def predict_img_only_api():
     """
-    API which detect all faces in an image and makes a prediction of the emotion for each face.
+    REST API which detect all faces in an image and makes a prediction of the emotion for each face.
     Unlike the previous 2 functions, it only return a single large image and no individual faces that are cropped are
     sent back. This is used by our real time emotion detection web page to cut down computation.
     This api uses inception-reset as default since it is the model with the best accuracy.
