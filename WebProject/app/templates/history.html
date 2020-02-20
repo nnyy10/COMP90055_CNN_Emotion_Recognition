@@ -30,13 +30,16 @@
 
                         <li style="margin-bottom: 10px">
                             <img src="{{ result["image_location"] }}" width="50" height="70" alt="User Image"/>
-                            {{result["0"]["emotion"]}}: {{result["0"]["probability"]}},
-                            {{result["1"]["emotion"]}}: {{result["1"]["probability"]}},
-                            {{result["2"]["emotion"]}}: {{result["2"]["probability"]}},
-                            {{result["3"]["emotion"]}}: {{result["3"]["probability"]}},
-                            {{result["4"]["emotion"]}}: {{result["4"]["probability"]}},
-                            {{result["5"]["emotion"]}}: {{result["5"]["probability"]}},
-                            {{result["6"]["emotion"]}}: {{result["6"]["probability"]}}
+                            {% for emo in result %}
+                                {{result["0"]["emotion"]}}: {{result["0"]["probability"]}},
+                                {{result["1"]["emotion"]}}: {{result["1"]["probability"]}},
+                                {{result["2"]["emotion"]}}: {{result["2"]["probability"]}},
+                                {{result["3"]["emotion"]}}: {{result["3"]["probability"]}},
+                                {{result["4"]["emotion"]}}: {{result["4"]["probability"]}},
+                                {{result["5"]["emotion"]}}: {{result["5"]["probability"]}},
+                                {{result["6"]["emotion"]}}: {{result["6"]["probability"]}}
+                            {% endfor %}
+
                         </li>
                         {% endfor %}
                     </ol>

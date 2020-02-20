@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+config.py file used for firebase database
+"""
+
 SECRET_KEY = 'hard to guess'
 DEBUG = True
 

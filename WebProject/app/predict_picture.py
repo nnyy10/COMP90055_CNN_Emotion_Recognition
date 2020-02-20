@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+"""
+This module contains the prediction script for inception resnet and mobilenetv2.
+
+There are 3 functions: predict, predict_upload and predict_img_only.
+
+predict: Used by predict_api in main.py. It returns a json object with bounding boxes drawn on the received image as
+well as all the faces and the predicted emotions.
+
+predict_upload: Used by the predict_upload_api in main.py. It also return a json object with bounding boxes drawn on
+the received image as well as all the faces and the predicted emotions. Additionally, it returns 3 more things
+which is required to upload to the database.
+
+predict_img_only: Used by the predict_img_only_api in main.py It only returns a json object with bound boxes drawn on
+the received image and nothing else. For our website, this is used by the "camera" page after the user has signed in.
+"""
+
 import tensorflow as tf
 import utils
 from face_detection import detect_faces

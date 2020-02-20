@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+This utils module contains all the utilities function needed to make the website run.
+
+Most of the functions are for image conversion. Other functions used for data processing and drawing bounding boxes.
+"""
+
 import base64
 import io
 import cv2
@@ -6,10 +13,18 @@ from collections import Counter
 from PIL import Image
 from face_detection import getxywh
 
+
+"""These two variables are needed for data preprocessing if the model is trained with data standardization and 
+normalization """
 data_mean = 0.5077424916139078
 data_std = 0.25016892401139035
 
+
+
 def process_face(image, face, size):
+    """
+    process_face crops a face from the original image as well as processing it so it is ready for prediction.
+    """
     box_x, box_y, box_w, box_h = getxywh(face)
     y, x, z = image.shape
     y_start = box_y
@@ -125,6 +140,9 @@ def base64_to_pil(base64_string):
 
 
 def draw_bounding_boxes(image, faces, face_emotion_prediction_dictionary):
+    """
+    draws the bounding boxes in the image
+    """
     for i, face in enumerate(faces):
         x, y, w, h = getxywh(face)
         image = cv2.rectangle(image, (x, y), (x + w, y + h), (255, 165, 0), 2)

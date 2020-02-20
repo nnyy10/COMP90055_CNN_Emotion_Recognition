@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+A flask application only used during testing. This is so that we don't need to wait for tensorflow to initialize
+everytime we want to edit some HTML page.
+"""
+
 from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from flask_bootstrap import Bootstrap
 import config
