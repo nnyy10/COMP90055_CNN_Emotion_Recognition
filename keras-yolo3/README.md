@@ -4,7 +4,9 @@
 
 ## Introduction
 
-A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
+This keras-yolo3 is git cloned from: https://github.com/qqwweee/keras-yolo3
+
+Based on this, we add more fucntions like camera for experience and images processing and predict script.
 
 
 ---
@@ -36,7 +38,7 @@ For Tiny YOLOv3, just do in a similar way, just specify model path and anchor pa
 Use --help to see usage of yolo_predict.py:
 ```
 usage: yolo_predict.py [-h] [--model MODEL] [--anchors ANCHORS]
-                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image] [--camera]
+                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image] [--camera] [--imgdir]
                      [--input] [--output]
 
 positional arguments:
@@ -53,7 +55,7 @@ optional arguments:
   --gpu_num GPU_NUM  Number of GPU to use, default 1
   --image            Image detection mode, will ignore all positional arguments
   --camera           Camera detection mode, will ignore all positional arguments
-  --imgdir           Predcit all images in one directory.
+  --imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
 ```
 ---
 
@@ -117,3 +119,7 @@ If you want to use original pretrained weights for YOLOv3:
     Like this:
     
     ![image](https://github.com/nnyy10/COMP90055_CNN_Emotion_Recognition/blob/master/keras-yolo3/imagefile/image_process.png)
+    
+9. Model can be evaluated using mAP. `--imgdir dir_path --txt` can make predictions .txt files for mAP
+
+   Quick start:  `git clone https://github.com/Cartucho/mAP`
