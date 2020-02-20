@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 Class definition of YOLO_v3 style detection model on image and video
 """
 
 import colorsys
-import os
 from timeit import default_timer as timer
-import cv2
-import codecs, json
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
-
 from yolo.yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo.yolo3.utils import letterbox_image
 import os
@@ -21,7 +16,6 @@ from keras.utils import multi_gpu_model
 global graph, model, sess
 from keras.backend import set_session
 import tensorflow as tf
-import keras
 import utils
 
 sess = tf.Session()
