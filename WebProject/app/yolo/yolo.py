@@ -117,6 +117,8 @@ class YOLO(object):
     def detect_image(self, image):
         start = timer()
 
+        old_image = image.copy()
+
         if self.model_image_size != (None, None):
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
             assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
@@ -164,6 +166,9 @@ class YOLO(object):
 
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
+        if len(out_boxes) == 0:
+            return {"found": False}
+
         font = ImageFont.truetype(font='yolo/font/FiraMono-Medium.otf',
                     size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300
@@ -207,7 +212,13 @@ class YOLO(object):
 
         end = timer()
         print("time:",end - start)
-        return image, len(out_boxes), prediction
+
+        output_rgb = utils.pil_to_rgb(image)
+        boxed_image = utils.rgb_to_buffer(output_rgb)
+        boxed_image = utils.buffer_to_base64_string(boxed_image)
+        results = predict_detail(old_image, prediction)
+        message = {"image": boxed_image, "found": True, "faces": results}
+        return message
 
 
 

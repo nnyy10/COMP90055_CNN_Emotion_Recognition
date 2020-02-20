@@ -5,7 +5,6 @@ import numpy as np
 from collections import Counter
 from PIL import Image
 from face_detection import getxywh
-import matplotlib.pyplot as plt
 
 data_mean = 0.5077424916139078
 data_std = 0.25016892401139035
@@ -30,8 +29,8 @@ def process_face(image, face, size):
     processed_face = cv2.cvtColor(cropped_face, cv2.COLOR_RGB2GRAY)
     processed_face = cv2.resize(processed_face, size)
     processed_face = np.true_divide(processed_face, 255)
-    processed_face = np.subtract(processed_face, data_mean)
-    processed_face = np.true_divide(processed_face, data_std)
+    # processed_face = np.subtract(processed_face, data_mean)
+    # processed_face = np.true_divide(processed_face, data_std)
     processed_face = np.stack((processed_face,) * 3, axis=-1)
     return cropped_face, processed_face
 

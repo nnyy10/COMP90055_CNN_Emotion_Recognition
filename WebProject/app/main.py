@@ -45,34 +45,6 @@ def predict_api():
         message = yolo.yolo_model.detect_image(pil_img)
         return jsonify(message)
 
-        oldimg = pil_img.copy()
-        output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(pil_img)
-        if num_faces == 0:
-            message = {"found": False}
-            return jsonify(message)
-        else:
-            output_rgb = utils.pil_to_rgb(output_PIL)
-            boxed_image = utils.rgbToString(output_rgb)
-            results = yolo.predict_detail(oldimg, predictions)
-            message = {"image": boxed_image[0], "found": True, "faces": results}
-            json_result = jsonify(message)
-            return json_result
-
-
-@app.route('/predict_img_only_api', methods=['GET', 'POST'])
-def predict_img_only_api():
-    img_base64 = request.json["image"]
-
-    rgb_img = utils.base64_to_rgb(img_base64)
-    boxed_image = predict_picture.predict(rgb_img, img_only=True)
-    if boxed_image is None:
-        message = {"found": False}
-        return jsonify(message)
-    else:
-        message = {"image": boxed_image[0], "found": True}
-        json_result = jsonify(message)
-        return json_result
-
 
 @app.route('/predict_upload_api', methods=['GET', 'POST'])
 def predict_upload_api():
@@ -83,9 +55,8 @@ def predict_upload_api():
 
     if model_to_use != "yolo3":
         rgb_img = utils.base64_to_rgb(img_base64)
-        boxed_image, result, face_predictions, cropped_face_buff = predict_picture.predict_upload(rgb_img)
-        if result is None:
-            message = {"found": False}
+        message, face_predictions, boxed_img_buff, cropped_face_buff = predict_picture.predict_upload(rgb_img)
+        if message["found"] is False:
             return jsonify(message)
         else:
             if 'email' in session:
@@ -96,7 +67,7 @@ def predict_upload_api():
                                                                                      "result": face_predictions})["name"]
 
                 image = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + entry_name + '.jpg')
-                image.put(boxed_image[1])
+                image.put(boxed_img_buff)
                 img_location = storage.child('upload/' + session.get('user_id') + '/' + entry_name + '/' + entry_name + '.jpg').get_url(None)
                 database.child('users').child(session.get('user_id')).child(entry_name).update({"image_location": img_location})
                 for i, face in enumerate(cropped_face_buff):
@@ -106,24 +77,20 @@ def predict_upload_api():
                     database.child('users').child(session.get('user_id')).child(entry_name).child("result").child(str(i)).update(
                         {"image_location": img_location})
 
-            message = {"image": boxed_image[0], "found": True, "faces": result}
             json_result = jsonify(message)
             return json_result
     else:
-        rgb_img = utils.base64_to_rgb(img_base64)
-        PIL_img = utils.rgb_to_pil(rgb_img)
-        oldimg = PIL_img.copy()
-        output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(PIL_img)
-        if num_faces == 0:
-            message = {"found": False}
-            return jsonify(message)
-        else:
-            output_rgb = utils.pil_to_rgb(output_PIL)
-            boxed_image = utils.rgbToString(output_rgb)
-            results = yolo.predict_detail(oldimg, predictions)
-            message = {"image": boxed_image[0], "found": True, "faces": results}
-            json_result = jsonify(message)
-            return json_result
+        pil_img = utils.base64_to_pil(img_base64)
+        message = yolo.yolo_model.detect_image(pil_img)
+        return jsonify(message)
+
+
+@app.route('/predict_img_only_api', methods=['GET', 'POST'])
+def predict_img_only_api():
+    img_base64 = request.json["image"]
+    rgb_img = utils.base64_to_rgb(img_base64)
+    message = predict_picture.predict_img_only(rgb_img)
+    return message
 
 
 @app.route('/login', methods=['GET', 'POST'])

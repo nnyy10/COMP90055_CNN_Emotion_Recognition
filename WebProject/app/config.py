@@ -1,3 +1,4 @@
+SECRET_KEY = 'hard to guess'
 DEBUG = True
 
 config = {
