@@ -64,6 +64,8 @@ public class ResultFragment extends Fragment {
             ArrayList<JSONObject> emotions = new ArrayList<>();
             for (int i = 0; i < 7; i++) {
                 try {
+                    if(faceSnapshot.child(Integer.toString(i)).getValue() == null)
+                        break;
                     JSONObject emotion = new JSONObject(faceSnapshot.child(Integer.toString(i)).getValue().toString());
                     emotions.add(emotion);
                 } catch (JSONException e) { e.printStackTrace(); }
@@ -84,9 +86,8 @@ public class ResultFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);//添加菜单不调用该方法是没有用的
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -99,8 +100,11 @@ public class ResultFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case R.id.main_back:
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HistoryFragment()).commit();
-//                startActivity(new Intent(this, LoginActivity.class));
+                getActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new HistoryFragment())
+                        .commit();
                 break;
         }
         return super.onOptionsItemSelected(item);

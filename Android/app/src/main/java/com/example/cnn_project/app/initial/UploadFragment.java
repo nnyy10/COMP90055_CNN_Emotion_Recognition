@@ -70,6 +70,9 @@ public class UploadFragment extends PermissionFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_initial, container, false);
+
+        getActivity().setTitle("Upload");
+
         choose = view.findViewById(R.id.choose);
         upload = view.findViewById(R.id.upload);
         imageView = view.findViewById(R.id.ImageView);
@@ -137,7 +140,8 @@ public class UploadFragment extends PermissionFragment {
             JSONObject obj = new JSONObject(response);
             if((boolean) obj.get("found")) {
                 Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
-                ResultFragment resultFragment = new ResultFragment(obj);
+                String fileName = fileString.substring(fileString.lastIndexOf("/")+1);
+                ResultFragment resultFragment = new ResultFragment(obj, fileName, this.mContext);
                 getActivity()
                         .getSupportFragmentManager()
                         .beginTransaction()

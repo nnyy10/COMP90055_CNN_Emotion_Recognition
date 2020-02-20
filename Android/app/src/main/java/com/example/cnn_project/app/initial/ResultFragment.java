@@ -1,28 +1,42 @@
 package com.example.cnn_project.app.initial;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.cnn_project.R;
+import com.example.cnn_project.app.utils;
+import com.example.cnn_project.object.DatabaseEntry;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ResultFragment extends Fragment {
 
@@ -30,16 +44,31 @@ public class ResultFragment extends Fragment {
     private RecyclerView recyclerView;
     private Context mContext;
     private JSONObject response;
+    private String imgName;
     private ImageView imageView_response_image;
 
-    public ResultFragment(JSONObject response) {
+    private FirebaseAuth mAuth;
+
+    private ProgressDialog progressDialog;
+
+    public ResultFragment(JSONObject response, String imgName, Context mContext) {
+        this.mContext = mContext;
         this.response = response;
+        this.imgName = imgName;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_response, container, false);
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            progressDialog = ProgressDialog.show(getActivity(), "","Please wait while the result is being uploaded to database...", true);
+            uploadToFirebase(this.response, currentUser);
+        }
 
         recyclerView = view.findViewById(R.id.faceRecyclerView);
         imageView_response_image = view.findViewById(R.id.imageView_response_image);
@@ -74,5 +103,69 @@ public class ResultFragment extends Fragment {
         }
 
         return view;
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void uploadToFirebase(final JSONObject response, final FirebaseUser currentUser) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                    StorageReference storage = FirebaseStorage.getInstance().getReference();
+
+                    final String userID = currentUser.getUid();
+                    String currentDateTime = utils.getCurrentTime();
+                    DatabaseReference newRef = database.child("users").child(userID).push();
+                    DatabaseEntry entry = new DatabaseEntry(imgName, currentDateTime);
+                    newRef.setValue(entry);
+                    final String databaseEntryName = newRef.getKey();
+                    String imgBase64 = (String) response.get("image");
+                    byte[] decodedString;
+                    decodedString = Base64.decode(imgBase64, Base64.DEFAULT);
+                    final StorageReference imgRef = storage.child("upload").child(userID).child(databaseEntryName).child(newRef.getKey() + ".jpg");
+                    imgRef.putBytes(decodedString).addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            database.child("users").child(userID).child(databaseEntryName).child("image_location").setValue(uri.toString());
+                                        }
+                                    });
+                                }
+                            });
+
+                    final JSONArray jsonFaces = response.getJSONArray("faces");
+                    for (int i = 0; i < jsonFaces.length(); i++){
+                        Map<String, Object> mapFaces = utils.jsonToMap((JSONObject) response.getJSONArray("faces").get(i));
+                        database.child("users").child(userID).child(databaseEntryName).child("result").child(Integer.toString(i)).setValue(mapFaces.get("prediction"));
+                        String faceBase64 = (String) mapFaces.get("face");
+                        byte[] faceBytes;
+                        faceBytes = Base64.decode(faceBase64, Base64.DEFAULT);
+                        final StorageReference faceRef = storage.child("upload").child(userID).child(databaseEntryName).child(Integer.toString(i) + ".jpg");
+                        final int finalI = i;
+                        faceRef.putBytes(faceBytes).addOnSuccessListener(
+                                new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        faceRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                database.child("users").child(userID).child(databaseEntryName).child("result").child(Integer.toString(finalI)).child("image_location").setValue(uri.toString());
+                                                if (finalI == jsonFaces.length()-1)
+                                                    progressDialog.dismiss();
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute();
     }
 }
