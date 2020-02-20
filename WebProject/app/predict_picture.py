@@ -13,7 +13,7 @@ global graph, model, sess
 sess = tf.Session()
 graph = tf.get_default_graph()
 set_session(sess)
-model = keras.models.load_model("model/best_model.h5", compile=False)
+model = keras.models.load_model("model/final_inception_resnet.h5", compile=False)
 
 
 def predict(image, img_only=False):

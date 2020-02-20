@@ -4,7 +4,9 @@ import numpy as np
 import tensorflow as tf
 import keras
 from os import path
-from utils import plot_loss_history, plot_acc_history, get_confusion_matrix
+
+from data_processing import format_x
+from utils import plot_loss_history, plot_acc_history, get_confusion_matrix, load_data_from_npy
 from models import *
 from keras.preprocessing.image import ImageDataGenerator
 import logging
@@ -16,34 +18,16 @@ from sklearn.utils import class_weight
 # ----------------------------------------------------------------------------
 """Set training parameters"""
 BATCH_SIZE = 64
-EPOCH = 50
-OPTIMIZER = keras.optimizers.RMSprop(lr=0.00001)
-# OPTIMIZER = "adadelta"
+EPOCH = 60
+OPTIMIZER = keras.optimizers.RMSprop(lr=0.001)
 LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
-# LOSS_FUNCTION = tf.keras.losses.squared_hinge
 SAVE_MODEL = True
 LOG = True
 PLOT_TRAINING_HISTORY = False
-# # CLASS_WEIGHT = {0:}
-y = np.concatenate((np.zeros(74374),
-                   np.ones(133915),
-                   np.ones(24959)*2,
-                   np.ones(13590)*3,
-                   np.ones(5878)*4,
-                   np.ones(3303)*5,
-                   np.ones(24382)*6))
-
-
-class_weights = class_weight.compute_class_weight('balanced', np.array([0, 1, 2, 3, 4, 5, 6]), y)
-# class_weights_dict = {}
-# for i in range(7):
-#     class_weights_dict[i] = class_weights[i]
-
-print(class_weights)
 
 print("loading model...")
-model_initializer = pretrained_facenet_inception_v1
-model = model_initializer(print_summary=True)
+model_initializer = pretrained_mobilenet
+model = model_initializer(print_summary=False)
 print("done \n")
 
 # ka = kaggle, uc = uncropped
@@ -53,12 +37,22 @@ DATA_SET_NAME = "kac"
 # if you wish to give the model an ID
 MODEL_NAME_ID = "valot3"
 
-IMG_SIZE = (160, 160)
+IMG_SIZE = (48, 48)
 
 
 # ----------------------------------------------------------------------------
 """Load data"""
 print('creating data generator')
+
+def preprocess(nparr):
+    result = np.subtract(nparr, 0.5077424916139078)
+    result = np.true_divide(result, 0.25016892401139035)
+    return result
+
+# train_datagen = ImageDataGenerator(rescale=1. / 255,
+#                                    featurewise_center=True,
+#                                    featurewise_std_normalization=True,
+#                                    preprocessing_function=preprocess)
 train_datagen = ImageDataGenerator(rescale=1. / 255,
                                    rotation_range=45,
                                    width_shift_range=0.2,
@@ -66,16 +60,23 @@ train_datagen = ImageDataGenerator(rescale=1. / 255,
                                    brightness_range=[0.5, 1.5],
                                    shear_range=0.2,
                                    zoom_range=0.2,
-                                   horizontal_flip=True)
-# train_datagen = ImageDataGenerator(rescale=1. / 255)
+                                   horizontal_flip=True,
+                                   featurewise_center=True,
+                                   featurewise_std_normalization=True,
+                                   preprocessing_function=preprocess)
 
-test_datagen = ImageDataGenerator(rescale=1. / 255)
+# train_datagen.fit(x_train)
+test_datagen = ImageDataGenerator(rescale=1. / 255,
+                                  featurewise_center=True,
+                                  featurewise_std_normalization=True,
+                                  preprocessing_function=preprocess)
+# test_datagen.fit(x_train)
 
 TRAIN_DIR = "data/processed_data/cropped_img/train"
 VALID_DIR = "data/processed_data/cropped_img/valid"
 TEST_DIR = "data/processed_data/cropped_img/test"
-# DATA_DIR = "C:\\Users\\naiyu\\Documents\\Naiyun\\ProcessedData"
-# TRAIN_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "train")
+DATA_DIR = "C:\\Users\\naiyu\\Documents\\Naiyun\\ProcessedData"
+# TRAIN_DIR = os.path.join(DATA_DIR, "blackwhite_reduced", "train_2")
 # VALID_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "valid")
 # TEST_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "test")
 
@@ -89,6 +90,8 @@ validation_generator = test_datagen.flow_from_directory(
     target_size=IMG_SIZE,
     batch_size=BATCH_SIZE)
 
+label_map = (validation_generator.class_indices)
+print(label_map)
 test_generator = test_datagen.flow_from_directory(
     TEST_DIR,
     target_size=IMG_SIZE,
