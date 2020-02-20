@@ -223,7 +223,10 @@ class YOLO(object):
                 self.input_image_shape: [image.size[1], image.size[0]],
                 K.learning_phase(): 0
             })
-
+        """
+        These can remove overlap boudinbg box of predictions having low score when IOU > 0.6.
+        If dealing with mutilabel dataset, doesnt need this.
+        """
         # remove_index = []
         # for i, box in enumerate(out_boxes):
         #     top1, left1, bottom1, right1 = out_boxes[i]
