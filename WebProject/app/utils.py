@@ -1,14 +1,40 @@
 import base64
-import json
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-from collections import Counter
-from PIL import Image
 import io
 import cv2
-import random
-import string
+import numpy as np
+from collections import Counter
+from PIL import Image
+from face_detection import getxywh
+import matplotlib.pyplot as plt
+
+data_mean = 0.5077424916139078
+data_std = 0.25016892401139035
+
+def process_face(image, face, size):
+    box_x, box_y, box_w, box_h = getxywh(face)
+    y, x, z = image.shape
+    y_start = box_y
+    y_end = box_y + box_h
+    x_start = box_x
+    x_end = box_x + box_w
+    if y_start < 0:
+        y_start = 0
+    if x_start < 0:
+        x_start = 0
+    if y_end > y-1:
+        y_end = y-1
+    if x_end > x-1:
+        x_end = x-1
+
+    cropped_face = image[y_start:y_end, x_start:x_end]
+    processed_face = cv2.cvtColor(cropped_face, cv2.COLOR_RGB2GRAY)
+    processed_face = cv2.resize(processed_face, size)
+    processed_face = np.true_divide(processed_face, 255)
+    processed_face = np.subtract(processed_face, data_mean)
+    processed_face = np.true_divide(processed_face, data_std)
+    processed_face = np.stack((processed_face,) * 3, axis=-1)
+    return cropped_face, processed_face
+
 
 emotions = ["Angry", "Disgust", "Fear", "Happy", "Neutral", "Sad", "Surprise"]
 
@@ -68,72 +94,50 @@ def get_class_num(y_list):
     return np.asarray(class_counter)
 
 
-def plot_acc_history(history):
-    # summarize history for accuracy
-    plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+def base64_to_rgb(base64_string):
+    img_data = base64.b64decode(str(base64_string))
+    image = Image.open(io.BytesIO(img_data))
+    return np.array(image)
 
 
-def plot_loss_history(history):
-    # summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-
-
-def load_data_from_npy(base_directory):
-    x_train = np.load(os.path.join(base_directory, 'x_train.npy'))
-    x_test = np.load(os.path.join(base_directory, 'x_test.npy'))
-    x_valid = np.load(os.path.join(base_directory, 'x_valid.npy'))
-
-    y_train = np.load(os.path.join(base_directory, 'y_train.npy'))
-    y_test = np.load(os.path.join(base_directory, 'y_test.npy'))
-    y_valid = np.load(os.path.join(base_directory, 'y_valid.npy'))
-
-    return x_train, y_train, x_valid, y_valid, x_test, y_test
-
-
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
-
-def stringToRGB(base64_string):
-    imgdata = base64.b64decode(str(base64_string))
-    image = Image.open(io.BytesIO(imgdata))
-    return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
-
-def rgbToString(BGR_array):
-    im_rgb = cv2.cvtColor(BGR_array.astype('uint8'), cv2.COLOR_BGR2RGB)
-    pil_img = Image.fromarray(im_rgb)
+def rgb_to_buffer(rgb_array):
+    pil_img = Image.fromarray(rgb_array.astype('uint8'))
 
     buff = io.BytesIO()
     pil_img.save(buff, format="JPEG")
-    buff_value = buff.getvalue()
-    return base64.b64encode(buff_value).decode("utf-8"),  buff_value
+    return buff.getvalue()
 
 
-def allowed_image(filename):
-    ALLOWED_EXTENSIONS = set(['TXT', 'PDF', 'PNG', 'JPG', 'JPEG', 'GIF'])
-    return '.' in filename and filename.rsplit('.', 1)[1].upper() in ALLOWED_EXTENSIONS
+def buffer_to_base64_string(buffer):
+    return base64.b64encode(buffer).decode("utf-8")
 
 
-def randomString(stringLength=10):
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(stringLength))
+def rgb_to_pil(rgb_img):
+    return Image.fromarray(rgb_img)
 
-def RGB_to_PIL_img(numpy_RGB_img):
-    return Image.fromarray(numpy_RGB_img)
 
-def PIL_img_to_RGB(PIL_img):
-    return np.array(PIL_img)
+def pil_to_rgb(pil_img):
+    return np.array(pil_img)
+
+
+def base64_to_pil(base64_string):
+    img_data = base64.b64decode(str(base64_string))
+    return Image.open(io.BytesIO(img_data))
+
+
+def draw_bounding_boxes(image, faces, face_emotion_prediction_dictionary):
+    for i, face in enumerate(faces):
+        x, y, w, h = getxywh(face)
+        image = cv2.rectangle(image, (x, y), (x + w, y + h), (255, 165, 0), 2)
+        face_emotion = face_emotion_prediction_dictionary[i][0]
+        font_scale = 0.9
+        font = cv2.FONT_HERSHEY_PLAIN
+        rectangle_bgr = (255, 255, 255)
+        text = str(i+1) + ". " + face_emotion["emotion"] + ": " + face_emotion["probability"]
+        (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
+        text_offset_x = x
+        text_offset_y = y - 1
+        box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + 2, text_offset_y - text_height - 2))
+        cv2.rectangle(image, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
+        cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(255, 165, 0), thickness=1)
+    return image

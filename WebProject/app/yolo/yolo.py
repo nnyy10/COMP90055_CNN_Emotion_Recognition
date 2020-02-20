@@ -22,7 +22,7 @@ global graph, model, sess
 from keras.backend import set_session
 import tensorflow as tf
 import keras
-from utils import stringToRGB, RGB_to_PIL_img, PIL_img_to_RGB, rgbToString
+import utils
 
 sess = tf.Session()
 graph = tf.get_default_graph()
@@ -337,9 +337,10 @@ def predict_detail(original_image,predictions):
         #(left,top,right,bottom)
         crop_region = prediction[2]
         crop_image = original_image.crop(crop_region)
-        output_rgb = PIL_img_to_RGB(crop_image)
-        boxed_image = rgbToString(output_rgb)
-        box_info = {"face":boxed_image[0],"prediction":[{"emotion":lable,"probability":str(round(score,2))}]}
+        output_rgb = utils.pil_to_rgb(crop_image)
+
+        boxed_image = utils.buffer_to_base64_string(utils.rgb_to_buffer(output_rgb))
+        box_info = {"face": boxed_image, "prediction": [{"emotion": lable, "probability": str(round(score, 2))}]}
         results.append(box_info)
     return results
 

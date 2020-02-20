@@ -1,7 +1,3 @@
-import base64
-import io
-import os
-from PIL import Image
 from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from flask_bootstrap import Bootstrap
 import config
@@ -10,8 +6,7 @@ import json
 from datetime import datetime
 import predict_picture
 import requests
-from utils import stringToRGB, RGB_to_PIL_img, PIL_img_to_RGB, rgbToString
-import time
+import utils
 from yolo import yolo
 
 
@@ -42,26 +37,22 @@ def predict_api():
     model_to_use = json_msg["model"]
 
     if model_to_use != "yolo3":
-        rgb_img = stringToRGB(img_base64)
-        boxed_image, result = predict_picture.predict(rgb_img)
-        if result is None:
-            message = {"found": False}
-            return jsonify(message)
-        else:
-            message = {"image": boxed_image[0], "found": True, "faces": result}
-            json_result = jsonify(message)
-            return json_result
+        rgb_img = utils.base64_to_rgb(img_base64)
+        message = predict_picture.predict(rgb_img)
+        return jsonify(message)
     else:
-        rgb_img = stringToRGB(img_base64)
-        PIL_img = RGB_to_PIL_img(rgb_img)
-        oldimg = PIL_img.copy()
-        output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(PIL_img)
+        pil_img = utils.base64_to_pil(img_base64)
+        message = yolo.yolo_model.detect_image(pil_img)
+        return jsonify(message)
+
+        oldimg = pil_img.copy()
+        output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(pil_img)
         if num_faces == 0:
             message = {"found": False}
             return jsonify(message)
         else:
-            output_rgb = PIL_img_to_RGB(output_PIL)
-            boxed_image = rgbToString(output_rgb)
+            output_rgb = utils.pil_to_rgb(output_PIL)
+            boxed_image = utils.rgbToString(output_rgb)
             results = yolo.predict_detail(oldimg, predictions)
             message = {"image": boxed_image[0], "found": True, "faces": results}
             json_result = jsonify(message)
@@ -72,7 +63,7 @@ def predict_api():
 def predict_img_only_api():
     img_base64 = request.json["image"]
 
-    rgb_img = stringToRGB(img_base64)
+    rgb_img = utils.base64_to_rgb(img_base64)
     boxed_image = predict_picture.predict(rgb_img, img_only=True)
     if boxed_image is None:
         message = {"found": False}
@@ -91,7 +82,7 @@ def predict_upload_api():
     model_to_use = json_msg["model"]
 
     if model_to_use != "yolo3":
-        rgb_img = stringToRGB(img_base64)
+        rgb_img = utils.base64_to_rgb(img_base64)
         boxed_image, result, face_predictions, cropped_face_buff = predict_picture.predict_upload(rgb_img)
         if result is None:
             message = {"found": False}
@@ -119,16 +110,16 @@ def predict_upload_api():
             json_result = jsonify(message)
             return json_result
     else:
-        rgb_img = stringToRGB(img_base64)
-        PIL_img = RGB_to_PIL_img(rgb_img)
+        rgb_img = utils.base64_to_rgb(img_base64)
+        PIL_img = utils.rgb_to_pil(rgb_img)
         oldimg = PIL_img.copy()
         output_PIL, num_faces, predictions = yolo.yolo_model.detect_image(PIL_img)
         if num_faces == 0:
             message = {"found": False}
             return jsonify(message)
         else:
-            output_rgb = PIL_img_to_RGB(output_PIL)
-            boxed_image = rgbToString(output_rgb)
+            output_rgb = utils.pil_to_rgb(output_PIL)
+            boxed_image = utils.rgbToString(output_rgb)
             results = yolo.predict_detail(oldimg, predictions)
             message = {"image": boxed_image[0], "found": True, "faces": results}
             json_result = jsonify(message)
@@ -210,7 +201,6 @@ def history():
     return ASK_LOGIN_TEXT
 
 
-
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'email' in session:
@@ -224,9 +214,11 @@ def profile():
         return render_template('profile.html', email=email, count=count)
     return ASK_LOGIN_TEXT
 
+
 @app.route('/aboutUs', methods=['GET', 'POST'])
 def aboutUs():
     return render_template('aboutUs.html')
+
 
 @app.route('/logout')
 def logout():
