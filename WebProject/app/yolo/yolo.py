@@ -31,7 +31,7 @@ set_session(sess)
 
 class YOLO(object):
     _defaults = {
-        "model_path": 'model/yolo.h5',
+        "model_path": 'model/final_yolo3.h5',
         "anchors_path": 'yolo/yolo_anchors.txt',
         "classes_path": 'yolo/emotion_classes.txt',
         "score" : 0.2,

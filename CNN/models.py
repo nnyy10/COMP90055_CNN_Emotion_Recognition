@@ -8,19 +8,27 @@ def pretrained_facenet_inception_v1(print_summary=False):
     model_dir = 'model/keras/model/facenet_keras.h5'
 
     inception_v1_model = keras.models.load_model(model_dir)
+    model = keras.Sequential()
+    model.add(inception_v1_model)
+    model.add(keras.layers.Dense(7, activation='softmax'))
+    if print_summary:
+        print(model.summary())
+    return model
+
+def pretrained_facenet_inception_v1_modified(print_summary=False):
+    model_dir = 'model/keras/model/facenet_keras.h5'
+
+    inception_v1_model = keras.models.load_model(model_dir)
     inception_v1_model._layers.pop()
     inception_v1_model._layers.pop()
     inception_v1_model._layers.pop()
     inception_v1_model._layers.pop()
 
-
-    inception_v1_model.summary()
 
     x = keras.layers.GlobalAveragePooling2D()(inception_v1_model.layers[-1].output)
     y = keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform')(x)
     z = keras.layers.Dense(7, activation='softmax')(y)
     model = Model(inputs=inception_v1_model.input, outputs=z)
-    model.summary()
     if print_summary:
         print(model.summary())
     return model
