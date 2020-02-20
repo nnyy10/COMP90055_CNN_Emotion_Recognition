@@ -102,10 +102,6 @@ def register():
 def home():
     return render_template('home.html', username=session.get('email'))
 
-@app.route('/aboutUs', methods=['GET', 'POST'])
-def aboutUs():
-    return render_template('aboutUs.html')
-
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     return render_template('upload.html', username=session.get('email'))

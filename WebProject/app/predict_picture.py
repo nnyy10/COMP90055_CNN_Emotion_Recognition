@@ -21,7 +21,11 @@ def predict(image, model_to_use="inception-resnet"):
         return {"found": False}
 
     print('processing faces...')
-    processed_faces_pair = [utils.process_face(image, face, size=(160, 160)) for face in faces]
+    if model_to_use == "mobilenetv2":
+        size = (48, 48)
+    else:
+        size = (160, 160)
+    processed_faces_pair = [utils.process_face(image, face, size=size) for face in faces]
     cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
     processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)
 
@@ -59,7 +63,11 @@ def predict_upload(image, model_to_use="inception-resnet"):
         return None, None, None, None
 
     print('processing faces...')
-    processed_faces_pair = [utils.process_face(image, face, size=(160, 160)) for face in faces]
+    if model_to_use == "mobilenetv2":
+        size = (48, 48)
+    else:
+        size = (160, 160)
+    processed_faces_pair = [utils.process_face(image, face, size=size) for face in faces]
 
     cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
     processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)

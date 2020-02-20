@@ -38,7 +38,7 @@ def predict_api():
 
     if model_to_use != "yolo3":
         rgb_img = utils.base64_to_rgb(img_base64)
-        message = predict_picture.predict(rgb_img)
+        message = predict_picture.predict(rgb_img, model_to_use=model_to_use)
         return jsonify(message)
     else:
         pil_img = utils.base64_to_pil(img_base64)
@@ -55,7 +55,7 @@ def predict_upload_api():
 
     if model_to_use != "yolo3":
         rgb_img = utils.base64_to_rgb(img_base64)
-        message, face_predictions, boxed_img_buff, cropped_face_buff = predict_picture.predict_upload(rgb_img)
+        message, face_predictions, boxed_img_buff, cropped_face_buff = predict_picture.predict_upload(rgb_img, model_to_use=model_to_use)
         if message["found"] is False:
             return jsonify(message)
         else:
@@ -180,11 +180,6 @@ def profile():
             count = 0
         return render_template('profile.html', email=email, count=count)
     return ASK_LOGIN_TEXT
-
-
-@app.route('/aboutUs', methods=['GET', 'POST'])
-def aboutUs():
-    return render_template('aboutUs.html')
 
 
 @app.route('/logout')
