@@ -1,4 +1,4 @@
-This is the final project of Master of Information Technology of University of Melbourne.
+# Android application for human emotion detection through image 
 
 This is the Android application of Human emotion through deep learning. 
 
