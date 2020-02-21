@@ -5,6 +5,10 @@ This WebProject contains a "app" folder which contains the webserver backend wri
 
 For more functionalities, the user can make an account and login. When logged in, each time a user makes a prediction, this prediction will be saved in the firebase database. The user can view all previous uploaded photos along with their predictions in the History page. The user also has the ability to use realtime prediction with inception-resnet if they go to the camera page. When uploading the pictures, the user can choose between 3 different models that were trained to detect emotions: inception-resnet, mobilenetv2 and yolo3 each with 69%, 57%, 48% accuracy respectively. If inception-resnet and mobilenetv2 are used, a face detection algorithm called MTCNN (https://github.com/ipazc/mtcnn) will be used to extract the faces which then will be preprocessed and passed in to inception-resnet or mobilenetv2. For yolo3, detection and classification happens in a single step.
 
+This server is currently deployed on `45.113.235.79` but is only accessible if connected to the Unimelb network or through a Unimelb VPN. It is not open to the public.
+
+**NOTE! Unfortunately, we were unable to get the server to run on HTTPS. Since the webcam requires HTTPS, real time emotion detection will not work if you try to connect to `45.113.235.79`. If you wish to test the real time detection part, you may download the docker image and run the docker image on localhost 127.0.0.1. Since the webbrowser treats localhost as secure HTTP, the webcam will be activated and can be tested.**
+
 ## REST API
 Besides serving the aforementioned web application, this web server also provides 3 different REST API. The details of each are listed below.
 
