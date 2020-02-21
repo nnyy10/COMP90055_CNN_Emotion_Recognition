@@ -1,7 +1,83 @@
 # WebProject
+
+## About
+This WebProject contains a "app" folder which contains the webserver backend written in python with Flask. This web server is a web application which allows users to upload an image via the browser and will make all face emotion prediction found in the image. The predicted emotions are: happy, sad, surprised, neutral, fear, disgust and the server will also return a percentage based on how certain each of the predictions are.
+
+For more functionalities, the user can make an account and login. When logged in, each time a user makes a prediction, this prediction will be saved in the firebase database. The user can view all previous uploaded photos along with their predictions in the History page. The user also has the ability to use realtime prediction with inception-resnet if they go to the camera page. When uploading the pictures, the user can choose between 3 different models that were trained to detect emotions: inception-resnet, mobilenetv2 and yolo3 each with 69%, 57%, 48% accuracy respectively. If inception-resnet and mobilenetv2 are used, a face detection algorithm called MTCNN (https://github.com/ipazc/mtcnn) will be used to extract the faces which then will be preprocessed and passed in to inception-resnet or mobilenetv2. For yolo3, detection and classification happens in a single step.
+
+## REST API
+Besides serving the aforementioned web application, this web server also provides 3 different REST API. The details of each are listed below.
+
+/predict_api
+
+```
+REST API which detect all faces in an image and makes a prediction of the emotion for each face.
+predict_api accepts JSON as input. Input must contain:
+  image: Base64 encoded image
+  model: Must be one of the following: yolo3, mobilenetv2, incpetion-resnet. Defaults to inception-resnet if the model is not valid.
+The API returns a JSON in the format of:
+  {
+  image: "Base64 encoded image with bounding boxes (present only if found is true)"
+  found: "Boolean value of whether a face(s) are found in the image."
+  faces: "List of {
+                    face: "Bse64 encoded cropped face image",
+                    prediction: "list of {
+                                          emotion: "the emotion with the highest probability
+                                          probability: "the probability"
+                                         }"
+                  }"(present only if found is true)
+  }
+```
+
+
+/predict_upload_api
+```
+REST API which detect all faces in an image and makes a prediction of the emotion for each face and uploads the result to the user's firebase database if the user is logged in. Functions like normal predict_api if the user is not signed in.However, uploading for yolo3 model is not yet implemented.
+predict_upload_api accepts JSON as input. Input must contain:
+  image: Base64 encoded image
+  model: Must be one of the following: yolo3, mobilenetv2, incpetion-resnet. Defaults to inception-resnet if the model is not valid.
+  img_name: The name of the image to be uploaded to firebase databse.
+The API returns a JSON in the format of:
+  {
+  image: "Base64 encoded image with bounding boxes (present only if found is true)"
+  found: "Boolean value of whether a face(s) are found in the image."
+  faces: "List of {
+                   face: "Bse64 encoded cropped face image",
+                   prediction: "list of {
+                                         emotion: "the emotion with the highest probability
+                                         probability: "the probability"
+                                         }"
+                   }"(present only if found is true)
+  }
+```
+    
+/predict_img_only_api
+```
+REST API which detect all faces in an image and makes a prediction of the emotion for each face and uploads the result
+to the user's firebase database if the user is logged in. Functions like normal predict_api if the user is not
+signed in.
+However, uploading for yolo3 model is not yet implemented.
+predict_upload_api accepts JSON as input. Input must contain:
+  image: Base64 encoded image
+  model: Must be one of the following: yolo3, mobilenetv2, incpetion-resnet. Defaults to inception-resnet if the model is not valid.
+  img_name: The name of the image to be uploaded to firebase databse.
+The API returns a JSON in the format of:
+  {
+  image: "Base64 encoded image with bounding boxes (present only if found is true)"
+  found: "Boolean value of whether a face(s) are found in the image."
+  faces: "List of {
+                   face: "Bse64 encoded cropped face image",
+                   prediction: "list of {
+                                         emotion: "the emotion with the highest probability
+                                         probability: "the probability"
+                                        }"
+                   }"(present only if found is true)
+  }
+```
+
 ## Flask-Guicorn-Docker Description
 
-Python flask web application running on Gunicorn and dockerized in a single container and deployed on a unbuntu server provided by Unimelb Research Cloud.
+This python flask web application will be running on Gunicorn and dockerized in a single container and deployed on a unbuntu server provided by Unimelb Research Cloud.
 
 Gunicorn is a Python WSGI HTTP Server for UNIX.It's a pre-fork worker model. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light on server resources, and fairly speedy.
 
