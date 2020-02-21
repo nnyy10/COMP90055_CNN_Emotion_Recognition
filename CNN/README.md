@@ -41,7 +41,7 @@ If the LOG variable is set to true, it will log all hyperparameters to the CNN/l
 The model will be saved in CNN/model/keras/model/ folder.
 
 
-**data_processing.p**, **utils.py** and **face_detection.py** contains helper functions for training and data extraction.
+**data_processing.py**, **utils.py** and **face_detection.py** contains helper functions for training and data extraction.
 
 **predict_picture.py** reads a single image and makes predictions, a similar file exists in WebProject/app.
 
