@@ -23,11 +23,11 @@ There are 4 data extraction scripts written for this data:
 
 **extract_raw_img.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw_img. The saved images will be sorted to train, test or validation data and sorted in to their respective class folders. This structure is nessesary for keras to read in the data.
 
-**extract_raw_img_data.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw as .npy file format for easy loading with Numpy if nessesary
+**extract_raw_img_data.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw as .npy file format for easy loading with Numpy if necessary
 
 **extract_cropped_img.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it to a jpg and save it in data/processed_data/cropped_img.
 
-**extract_cropped_img_data.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it as .npy file for numpy loading if nessesary.
+**extract_cropped_img_data.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it as .npy file for numpy loading if necessary.
 
 The other files in data_extraction is used for training in YOLO and is not relavent for this CNN project with inception-resnet and mobilenetv2.
 
