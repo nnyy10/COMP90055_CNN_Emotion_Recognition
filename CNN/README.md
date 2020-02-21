@@ -31,6 +31,8 @@ There are 4 data extraction scripts written for this data:
 
 The other files in data_extraction is used for training in YOLO and is not relavent for this CNN project with inception-resnet and mobilenetv2.
 
+To run this script, make sure to download the kaggle data from the link provided above and save it under CNN/data/
+
 ## Model training and fine tuning
 
 All models used are created in the **models.py** file
