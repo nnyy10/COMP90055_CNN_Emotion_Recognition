@@ -16,4 +16,19 @@ For mobilenetv2, we simply used keras.applications's pretrained model on imagene
 
 ## Data processing and extraction
 
-For inception-resnet and mobilenetv2, we used a dataset provided by kaggle (details can be found https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/overview)
+For inception-resnet and mobilenetv2, we used a dataset provided by kaggle (details can be found https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/overview). This dataset contains ~36,000 black and white 48x48 images of human faces already cropped and labeled. The labeled data include ~29,000 train data and ~3,500 test data and ~3,500 validation data. The data is imbalanced having 13.91% Angry, 1.51% Disgust, 14.27% Fear, 25.13% Happy, 16.82% Sad, 11.04% Surprised, 17.29% Neutral.
+
+The data comes in a single CSV file with 1 column being the pixel array values, another column indicating the emotion.
+There are 4 data extraction scripts written for this data:
+
+**extract_raw_img.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw_img. The saved images will be sorted to train, test or validation data and sorted in to their respective class folders. This structure is nessesary for keras to read in the data.
+
+**extract_raw_img_data.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw as .npy file format for easy loading with Numpy if nessesary
+
+**extract_cropped_img.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it to a jpg and save it in data/processed_data/cropped_img.
+
+**extract_cropped_img_data.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it as .npy file for numpy loading if nessesary.
+
+The other files in data_extraction is used for training in YOLO and is not relavent for this CNN project with inception-resnet and mobilenetv2.
+
+## Model training and fine tuning
