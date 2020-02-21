@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Module that takes the preprocessed data in data/processed_data/(cropped_img or raw_img) and loads the pre trained models
+defined in model.py and starts training it. Afterwards saving the model in model/keras/model/ as well as a log file in
+log/.
+
+Different hyper-parameters can be defined in the beginning of the script such as epoch, batchsize, loss function etc.
+"""
+
 # ----------------------------------------------------------------------------
 """Import modules"""
 import numpy as np
@@ -18,7 +27,7 @@ from sklearn.utils import class_weight
 # ----------------------------------------------------------------------------
 """Set training parameters"""
 BATCH_SIZE = 64
-EPOCH = 60
+EPOCH = 30
 OPTIMIZER = keras.optimizers.RMSprop(lr=0.001)
 LOSS_FUNCTION = tf.keras.losses.categorical_crossentropy
 SAVE_MODEL = True
@@ -31,11 +40,9 @@ model = model_initializer(print_summary=False)
 print("done \n")
 
 # ka = kaggle, uc = uncropped
-# DATA_SET_LIST = ["blackwhite_original", "blackwhite_reduced", "colored_original", "colored_reduced"]
-# DATA_SET_NAME = DATA_SET_LIST[0]
 DATA_SET_NAME = "kac"
-# if you wish to give the model an ID
-MODEL_NAME_ID = "valot3"
+# if you wish to give the model a unique ID
+MODEL_NAME_ID = ""
 
 IMG_SIZE = (48, 48)
 
@@ -49,10 +56,7 @@ def preprocess(nparr):
     result = np.true_divide(result, 0.25016892401139035)
     return result
 
-# train_datagen = ImageDataGenerator(rescale=1. / 255,
-#                                    featurewise_center=True,
-#                                    featurewise_std_normalization=True,
-#                                    preprocessing_function=preprocess)
+
 train_datagen = ImageDataGenerator(rescale=1. / 255,
                                    rotation_range=45,
                                    width_shift_range=0.2,
@@ -65,21 +69,14 @@ train_datagen = ImageDataGenerator(rescale=1. / 255,
                                    featurewise_std_normalization=True,
                                    preprocessing_function=preprocess)
 
-# train_datagen.fit(x_train)
 test_datagen = ImageDataGenerator(rescale=1. / 255,
                                   featurewise_center=True,
                                   featurewise_std_normalization=True,
                                   preprocessing_function=preprocess)
-# test_datagen.fit(x_train)
 
 TRAIN_DIR = "data/processed_data/cropped_img/train"
 VALID_DIR = "data/processed_data/cropped_img/valid"
 TEST_DIR = "data/processed_data/cropped_img/test"
-DATA_DIR = "C:\\Users\\naiyu\\Documents\\Naiyun\\ProcessedData"
-# TRAIN_DIR = os.path.join(DATA_DIR, "blackwhite_reduced", "train_2")
-# VALID_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "valid")
-# TEST_DIR = os.path.join(DATA_DIR, DATA_SET_NAME, "test")
-
 train_generator = train_datagen.flow_from_directory(
     TRAIN_DIR,
     target_size=IMG_SIZE,
@@ -103,7 +100,6 @@ model.compile(optimizer=OPTIMIZER, metrics=['accuracy'], loss=LOSS_FUNCTION)
 print('done \n')
 
 print('fitting model... ')
-# history = model.fit_generator(train_generator, epochs=EPOCH, verbose=1, validation_data=validation_generator, class_weight=class_weights)
 history = model.fit_generator(train_generator, epochs=EPOCH, verbose=1, validation_data=validation_generator)
 print('done \n')
 

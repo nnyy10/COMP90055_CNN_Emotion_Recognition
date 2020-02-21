@@ -51,10 +51,13 @@ public class ResultFragment extends Fragment {
 
     private ProgressDialog progressDialog;
 
-    public ResultFragment(JSONObject response, String imgName, Context mContext) {
+    private String modelToUse;
+
+    public ResultFragment(JSONObject response, String imgName, Context mContext, String modelToUse) {
         this.mContext = mContext;
         this.response = response;
         this.imgName = imgName;
+        this.modelToUse = modelToUse;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class ResultFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (currentUser != null) {
+        if (currentUser != null && !modelToUse.equals("yolo3")) {
             progressDialog = ProgressDialog.show(getActivity(), "","Please wait while the result is being uploaded to database...", true);
             uploadToFirebase(this.response, currentUser);
         }

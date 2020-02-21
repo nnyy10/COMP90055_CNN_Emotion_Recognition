@@ -61,6 +61,8 @@ public class UploadFragment extends PermissionFragment {
 
     private ProgressDialog progressDialog;
 
+    private String modelUsed = "";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +112,8 @@ public class UploadFragment extends PermissionFragment {
                         else if (radio_yolo3.isChecked())
                             model = "yolo3";
 
+                        modelUsed = model;
+
                         JSONObject postData = new JSONObject();
                         try {
                             postData.put("image", image);
@@ -141,7 +145,7 @@ public class UploadFragment extends PermissionFragment {
             if((boolean) obj.get("found")) {
                 Toast.makeText(mContext, "found face", Toast.LENGTH_LONG).show();
                 String fileName = fileString.substring(fileString.lastIndexOf("/")+1);
-                ResultFragment resultFragment = new ResultFragment(obj, fileName, this.mContext);
+                ResultFragment resultFragment = new ResultFragment(obj, fileName, this.mContext, modelUsed);
                 getActivity()
                         .getSupportFragmentManager()
                         .beginTransaction()
