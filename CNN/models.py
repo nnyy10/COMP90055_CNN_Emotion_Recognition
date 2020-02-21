@@ -9,7 +9,11 @@ from keras.regularizers import l2
 from keras.models import Model
 from keras.layers import Input
 
+
 def pretrained_facenet_inception_v1(print_summary=False):
+    """
+    base inception-resent model loaded from pre-trained weights
+    """
     model_dir = 'model/keras/model/facenet_keras.h5'
 
     inception_v1_model = keras.models.load_model(model_dir)
@@ -21,6 +25,10 @@ def pretrained_facenet_inception_v1(print_summary=False):
     return model
 
 def pretrained_facenet_inception_v1_modified(print_summary=False):
+    """
+    inception-resnet with the last layers being dropout layer and bottleneck layer replaced with 2 fully connected
+    dense layer.
+    """
     model_dir = 'model/keras/model/facenet_keras.h5'
 
     inception_v1_model = keras.models.load_model(model_dir)
@@ -39,6 +47,9 @@ def pretrained_facenet_inception_v1_modified(print_summary=False):
     return model
 
 def pretrained_facenet_inception_v1_svm(print_summary=False):
+    """
+    inception-resnet with the loss function being that similar to the SVM with l2 kernel regularizer.
+    """
     model_dir = 'model/keras/model/facenet_keras.h5'
 
     inception_v1_model = keras.models.load_model(model_dir)
@@ -53,6 +64,9 @@ def pretrained_facenet_inception_v1_svm(print_summary=False):
 
 
 def pretrained_mobilenet(print_summary=False):
+    """
+    Mobilenetv2 model pre-trained on imagenet.
+    """
     mobilenet = keras.applications.MobileNetV2(input_shape=(48, 48, 3),
                                                include_top=False,
                                                weights='imagenet')
