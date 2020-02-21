@@ -31,6 +31,10 @@ mobilenetv2_model = keras.models.load_model("model/final_mobilenetv2.h5", compil
 
 
 def predict(image, model_to_use="inception-resnet"):
+
+    """some image passed in may be in 2d for some weird reason, the following code expands it to 3d"""
+    if image.ndim == 2:
+        image = np.stack((image,) * 3, axis=-1)
     faces = detect_faces(image)
 
     if len(faces) == 0:
