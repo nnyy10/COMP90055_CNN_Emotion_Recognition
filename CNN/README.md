@@ -23,12 +23,29 @@ There are 4 data extraction scripts written for this data:
 
 **extract_raw_img.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw_img. The saved images will be sorted to train, test or validation data and sorted in to their respective class folders. This structure is nessesary for keras to read in the data.
 
-**extract_raw_img_data.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw as .npy file format for easy loading with Numpy if nessesary
+**extract_raw_img_data.py** - converts the image array in csv to a jpg and save it in data/processed_data/raw as .npy file format for easy loading with Numpy if necessary
 
 **extract_cropped_img.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it to a jpg and save it in data/processed_data/cropped_img.
 
-**extract_cropped_img_data.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it as .npy file for numpy loading if nessesary.
+**extract_cropped_img_data.py** - reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it as .npy file for numpy loading if necessary.
 
 The other files in data_extraction is used for training in YOLO and is not relavent for this CNN project with inception-resnet and mobilenetv2.
 
+To run this script, make sure to download the kaggle data from the link provided above and save it under CNN/data/
+
 ## Model training and fine tuning
+
+All models used are created in the **models.py** file
+
+There are 2 training files: **train_batches.py** and **train_whole.py**. train_whole.py loads the data from npy while train_batches.py loads the data from the jpgs extracted from the previous scripts.
+There are variables such as batch size, image size, epoch, loss function at the top of these two files which can be changed easily.
+If the LOG variable is set to true, it will log all hyperparameters to the CNN/log/ folder along with training, validation loss and accuracy as well as a confusion matrix.
+The model will be saved in CNN/model/keras/model/ folder.
+
+
+**data_processing.py**, **utils.py** and **face_detection.py** contains helper functions for training and data extraction.
+
+**predict_picture.py** reads a single image and makes predictions, a similar file exists in WebProject/app.
+
+**predict_ensemble.py** reads in 3 files, takes an average of the predictions and outputs a final prediction. This file was used to test the method of enembling of three different models to see whether the accuracy would increase or not.
+
