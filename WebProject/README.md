@@ -75,6 +75,9 @@ The API returns a JSON in the format of:
   }
 ```
 
+If the server receives invalid json, a `{"error": "failed to parse json, invalid format"}` will be returned.
+If the server fails to process the image possibly due to invalid image format, a `{"error": "failed to process image, try another image"}` will be returned.
+
 ## Flask-Guicorn-Docker Description
 
 This python flask web application will be running on Gunicorn and dockerized in a single container and deployed on a unbuntu server provided by Unimelb Research Cloud.
