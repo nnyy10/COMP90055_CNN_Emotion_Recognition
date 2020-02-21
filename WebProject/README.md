@@ -7,6 +7,12 @@ For more functionalities, the user can make an account and login. When logged in
 
 This server is currently deployed on `45.113.235.79` but is only accessible if connected to the Unimelb network or through a Unimelb VPN. It is not open to the public.
 
+NOTE! If you wish to run this web application yourself, it is important to follow the following steps:
+1. Create a folder in WebProject/app/ called "model"
+2. Go to https://drive.google.com/drive/folders/1-c_RcF6JIh8S8B2qYjCo6AQkGZKTOVlp?usp=sharing
+3. Download `CNN/yolo models/final_yolo3.h5`, `CNN/inception resnet mobilenet models/final_mobilenetv2.h5` and `CNN/inception resnet mobilenet models/final_inception_resnet.h5`
+4. Places all three model files inside: WebProject/app/model.**
+
 **NOTE! Unfortunately, we were unable to get the server to run on HTTPS. Since the webcam requires HTTPS, real time emotion detection will not work if you try to connect to `45.113.235.79`. If you wish to test the real time detection part, you may download the docker image and run the docker image on localhost 127.0.0.1. Since the webbrowser treats localhost as secure HTTP, the webcam will be activated and can be tested.**
 
 ## REST API
