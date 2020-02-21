@@ -20,6 +20,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+// This is an adapter for showing all information of each  detected face image in a recycle view.
+// Each face image has serial number, face image and results of emotion detection. This
+// FacesViewAdapter is used to show results before users logging in. These information is getting
+// from web server.
+
 public class FacesViewAdapter extends RecyclerView.Adapter<FacesViewAdapter.ViewHolder>{
     private ArrayList<JSONObject> faceList;
     private Activity mActivity;
@@ -36,6 +41,8 @@ public class FacesViewAdapter extends RecyclerView.Adapter<FacesViewAdapter.View
         return holder;
     }
 
+    // The faceNumberText shows the serial number of face image. The faceImageView shows the face
+    // image. The emotionText shows emotion detection results.
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.faceNumberText.setText(Integer.toString(position + 1) + ". ");
@@ -54,6 +61,7 @@ public class FacesViewAdapter extends RecyclerView.Adapter<FacesViewAdapter.View
 
     }
 
+    // Seven emotions are shown with their probabilities by appending together.
     private String getTextForFace(JSONArray face) throws JSONException {
         StringBuilder output = new StringBuilder();
         for (int i = 0; i< face.length(); i++) {

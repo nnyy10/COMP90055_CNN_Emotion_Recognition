@@ -24,6 +24,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
+// This is the sign up page, which is for users to create a new account. Users can sign up with
+// email and password. If the email has not been registered, the registration is successful.
 
 public class SignUpActivity extends AppCompatActivity {
 
