@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+All keras models including all variations to inception-resnet and mobilenet v2
+"""
+
 import keras
 import tensorflow as tf
 from keras.regularizers import l2

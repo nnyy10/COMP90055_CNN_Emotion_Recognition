@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+This module converts the image array in csv to a jpg and save it in data/processed_data/raw as .npy file format for easy
+loading with Numpy if necessary.
+"""
 import csv
 import numpy as np
 from utils import emotion_int_to_str

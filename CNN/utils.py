@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Utilities functions that help during data pre-processing and training
+"""
+
 import keras
 import os
 import numpy as np

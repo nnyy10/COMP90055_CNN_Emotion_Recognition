@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Module that takes the preprocessed data in data/processed_data/(cropped_img or raw_img) and loads the pre trained models
+defined in model.py and starts training it. Afterwards saving the model in model/keras/model/ as well as a log file in
+log/.
+
+Different hyper-parameters can be defined in the beginning of the script such as epoch, batchsize, loss function etc.
+"""
+
 # ----------------------------------------------------------------------------
 """Import modules"""
 import numpy as np

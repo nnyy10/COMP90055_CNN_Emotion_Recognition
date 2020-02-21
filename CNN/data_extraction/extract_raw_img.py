@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+This module converts the image array in csv to a jpg and save it in data/processed_data/raw_img. The saved images will
+be sorted to train, test or validation data and sorted in to their respective class folders. This structure is necessary
+for keras to read in the data.
+"""
 import csv
 import numpy as np
 from PIL import Image

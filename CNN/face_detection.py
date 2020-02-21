@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+MTCNN module for face detection, used for data processing and predicting
+"""
+
 import cv2
 from mtcnn import MTCNN
 import matplotlib.pyplot as plt

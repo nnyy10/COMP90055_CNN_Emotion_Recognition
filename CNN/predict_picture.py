@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Python scripts to test given an image, use MTCNN to crop the face and run through our trained model.
+Depreciated, a more updated version can be found in WebProject/app/predict_picture.py
+"""
+
 import cv2
 from data_processing import process_face
 from face_detection import display_all_faces
