@@ -33,16 +33,17 @@ The other files in data_extraction is used for training in YOLO and is not relav
 
 ## Model training and fine tuning
 
-All models used are created in the "models.py" file
+All models used are created in the **models.py** file
 
-There are 2 training files: train_batches.py and train_whole.py. train_whole.py loads the data from npy while train_batches.py loads the data from the jpgs extracted from the previous scripts.
+There are 2 training files: **train_batches.py** and **train_whole.py**. train_whole.py loads the data from npy while train_batches.py loads the data from the jpgs extracted from the previous scripts.
 There are variables such as batch size, image size, epoch, loss function at the top of these two files which can be changed easily.
 If the LOG variable is set to true, it will log all hyperparameters to the CNN/log/ folder along with training, validation loss and accuracy as well as a confusion matrix.
+The model will be saved in CNN/model/keras/model/ folder.
 
 
-data_processing.py, utils.py and face_detection.py contains helper functions for training and data extraction.
+**data_processing.p**, **utils.py** and **face_detection.py** contains helper functions for training and data extraction.
 
-predict_picture.py reads a single image and makes predictions, a similar file exists in WebProject/app.
+**predict_picture.py** reads a single image and makes predictions, a similar file exists in WebProject/app.
 
-predict_ensemble reads in 3 files, takes an average of the predictions and outputs a final prediction. This file was used to test the method of enembling of three different models to see whether the accuracy would increase or not.
+**predict_ensemble.py** reads in 3 files, takes an average of the predictions and outputs a final prediction. This file was used to test the method of enembling of three different models to see whether the accuracy would increase or not.
 
