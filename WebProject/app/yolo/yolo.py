@@ -28,8 +28,8 @@ class YOLO(object):
         "model_path": 'model/final_yolo3.h5',
         "anchors_path": 'yolo/yolo_anchors.txt',
         "classes_path": 'yolo/emotion_classes.txt',
-        "score" : 0.2,
-        "iou" : 0.7,
+        "score" : 0.3,
+        "iou" : 0.45,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
     }
