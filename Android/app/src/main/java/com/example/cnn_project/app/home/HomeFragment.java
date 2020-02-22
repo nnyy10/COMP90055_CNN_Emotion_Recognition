@@ -13,6 +13,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.cnn_project.R;
 
+/**
+ * This is HomeFragment, which has some introductions of this application.
+ */
+
 public class HomeFragment extends Fragment {
 
     @Nullable

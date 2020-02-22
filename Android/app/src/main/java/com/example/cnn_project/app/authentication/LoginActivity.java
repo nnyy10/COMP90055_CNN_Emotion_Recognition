@@ -25,10 +25,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 
-// This is the login page. Users need to enter email and password to log in. If the entered email
-// and password are valid, which are stored in Firebase authentication, then users will be
-// successful to log in and go to the home page. If the user does not have an account, they could
-// sign up a new account.
+/**
+ * This is the login page. Users need to enter email and password to log in. If the entered email
+ * and password are valid, which are stored in Firebase authentication, then users will be
+ * successful to log in and go to the home page. If the user does not have an account, they could
+ * sign up a new account.
+ */
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -67,7 +69,9 @@ public class LoginActivity extends AppCompatActivity {
         };
     }
 
-    // When click the sign up botton, the page will go from the login page to the sign up page.
+    /**
+     * When click the sign up botton, the page will go from the login page to the sign up page.
+     */
     private View.OnClickListener signupListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -75,9 +79,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     };
 
-    // When users click the log in button, the entered email and password will be checked whether
-    // the information is valid. Error messages will be given to the wrong information. If login is
-    // successful, the page will go to the home.
+    /**
+     * When users click the log in button, the entered email and password will be checked whether
+     * the information is valid. Error messages will be given to the wrong information. If login is
+     * successful, the page will go to the home.
+     */
     private View.OnClickListener loginListener = new View.OnClickListener() {
         public void onClick(View v) {
             final String email = email_Login.getText().toString();

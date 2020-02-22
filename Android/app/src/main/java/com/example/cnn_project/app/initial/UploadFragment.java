@@ -48,6 +48,13 @@ import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import com.example.cnn_project.app.Global;
 
+/**
+ * This is the upload page, which is used in two places, both the UploadFragment before users
+ * signing in and the upload page after users signing in. It enables users to select a photo and
+ * upload it. Also there are three models provided for users, radio_inception_resnet,
+ * radio_mobilenetv2, radio_yolo3.
+ */
+
 public class UploadFragment extends PermissionFragment {
 
     private Button choose, upload;
@@ -85,12 +92,16 @@ public class UploadFragment extends PermissionFragment {
         radio_inception_resnet.setChecked(true);
 
         choose.setOnClickListener(chooseListener);
-        upload.setOnClickListener(uploadListender);
+        upload.setOnClickListener(uploadListener);
 
         return view;
     }
 
-    private View.OnClickListener uploadListender = new View.OnClickListener() {
+    /**
+     * When uploading, the selected image and model will be sending to the web server to run
+     * predict functions.
+     */
+    private View.OnClickListener uploadListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (null != imageView.getDrawable()) {
@@ -134,10 +145,14 @@ public class UploadFragment extends PermissionFragment {
         }
     };
 
+    /**
+     * If there is any face been detected in the image, the page will automatically go from the
+     * current page to the result page. Otherwise, the error messages will be given.
+     */
     private void processResponse(String response) {
         progressDialog.dismiss();
         if (response == null){
-            Toast.makeText(mContext, "An error has occured. Cannot connect to the prediction server.", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "An error has occurred. Cannot connect to the prediction server.", Toast.LENGTH_LONG).show();
             return;
         }
         try {
@@ -160,7 +175,11 @@ public class UploadFragment extends PermissionFragment {
         }
     }
 
-
+    /**
+     * When clicking the "choose" button, a dialog will be shown with three options, "Take Photo",
+     * "Choose from Gallery" or "Cancel". Users can either use camera to take a photo, or choose an
+     * image from gallery.
+     */
     private View.OnClickListener chooseListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -204,6 +223,9 @@ public class UploadFragment extends PermissionFragment {
         }
     };
 
+    /**
+     * This function is used to show the selected image on the page.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_CANCELED) {

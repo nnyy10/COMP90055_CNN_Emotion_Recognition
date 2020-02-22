@@ -4,10 +4,13 @@ import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 
-// This is the History class, which declares data types of the information of histories. It has
-// five variables. The image_id means the id of image. The image_location means the stored location
-// in the storage of the firebase. The image_name is the name of image. The submit_time is the time
-// when uploading the image, while the facesSnapshot stores detailed detection results of the image.
+/**
+ * This is the History class, which declares data types of the information of histories. It has
+ * five variables. The image_id means the id of image. The image_location means the stored location
+ * in the storage of the firebase. The image_name is the name of image. The submit_time is the time
+ * when uploading the image, while the facesSnapshot stores detailed detection results of the image.
+ * It is mainly used in HistoryAdapter.
+ */
 
 public class History {
     public String image_id;

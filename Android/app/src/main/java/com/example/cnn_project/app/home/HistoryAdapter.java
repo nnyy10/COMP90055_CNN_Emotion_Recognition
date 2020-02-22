@@ -17,8 +17,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-// This is an adapter for showing a history of all previous predictions of users. After users
-// logging in, they can view all history and see more details.
+/**
+ * This is an adapter for showing a history of all previous predictions of users. After users
+ * logging in, they can view all history and see more details.
+ */
 
 public class HistoryAdapter extends ArrayAdapter<History> {
 
@@ -34,9 +36,11 @@ public class HistoryAdapter extends ArrayAdapter<History> {
         this.historyList = historyList;
     }
 
-    // The image_name_layout shows the image name. The submit_time_layout shown the submit time.
-    // The image_layout shown the precessed image. There is a "click" button in each result_layout.
-    // If users want to see detailed results, they can click it and go to the result page.
+    /**
+     * The image_name_layout shows the image name. The submit_time_layout shown the submit time.
+     * The image_layout shown the precessed image. There is a "click" button in each result_layout.
+     * If users want to see detailed results, they can click it and go to the result page.
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

@@ -24,9 +24,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-// This is the history page, which shows all previous predictions. It has four sections,
-// Submit time, Image name, Image and Result. These history data is retrieved from realtime
-// database of firebase through reference.
+/**
+ * This is the history page, which shows all previous predictions. It has four sections,
+ * Submit time, Image name, Image and Result. These history data is retrieved from realtime
+ * database of firebase through reference.
+ */
 
 public class HistoryFragment extends Fragment {
 
@@ -38,7 +40,9 @@ public class HistoryFragment extends Fragment {
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseUser user = firebaseAuth.getCurrentUser();
 
-    // When retrieving histories, the user's uid is used to find the stored reference.
+    /**
+     * When retrieving histories, the user's uid is used to find the stored reference.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,8 +56,10 @@ public class HistoryFragment extends Fragment {
         return view;
     }
 
-    // These stored information will transfer to History object through the declared constructor
-    // of History.
+    /**
+     * These stored information will transfer to History object through the declared constructor
+     * of History.
+     */
     @Override
     public void onStart() {
         uidRef.addValueEventListener(new ValueEventListener() {
