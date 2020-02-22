@@ -1,6 +1,5 @@
 package com.example.cnn_project.app.initial;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +10,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.cnn_project.R;
 import com.example.cnn_project.app.authentication.LoginActivity;
+
+/**
+ * This is the main activity. When users enter this application, it first runs this activity and
+ * shows UploadFragment in the fragment container.
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
                 initialFragment).commit();
     }
 
+    /**
+     * There is a "sign in" button in the menu. When clicking it, the page will from the current
+     * page to the log in page.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -40,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * If users press the back button in the main activity, it will exit this application and
+     * return to the mobile page.
+     */
     @Override
     public void onBackPressed(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);

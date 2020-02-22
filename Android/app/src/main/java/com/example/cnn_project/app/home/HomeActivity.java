@@ -12,9 +12,11 @@ import com.example.cnn_project.R;
 import com.example.cnn_project.app.initial.UploadFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-// This is the home acticity, which has four main fragments, HomeFragment, UploadFragment,
-// HistoryFragment and ProfileFragment. There is a navigation bar in the bottom, and clicking each
-// item in the bar will jump to the corresponding page. The default entry page is HomeFragment.
+/**
+ * This is the home activity, which has four main fragments, HomeFragment, UploadFragment,
+ * HistoryFragment and ProfileFragment. There is a navigation bar in the bottom, and clicking each
+ * item in the bar will jump to the corresponding page. The default entry page is HomeFragment.
+ */
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -57,8 +59,10 @@ public class HomeActivity extends AppCompatActivity {
                 }
             };
 
-    // If users press the back button in home activity, no matter which fragment it shows, it will
-    // exit this application and return to the mobile page.
+    /**
+     * If users press the back button in home activity, no matter which fragment it shows, it will
+     * exit this application and return to the mobile page.
+     */
     @Override
     public void onBackPressed(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);

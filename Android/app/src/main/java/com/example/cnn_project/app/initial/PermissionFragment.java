@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+/**
+ * This fragment is used to get permissions from devices when using the phone camera.
+ */
+
 public class PermissionFragment extends Fragment {
 
     @Override

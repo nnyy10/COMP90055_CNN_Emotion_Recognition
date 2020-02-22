@@ -16,6 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is used to define some functions, which can be used in other classes.
+ */
+
 public class utils {
 
     public static Bitmap rotateImage(Bitmap source, float angle) {
@@ -25,6 +29,9 @@ public class utils {
                 matrix, true);
     }
 
+    /**
+     * This is used to get the current time, and returned in a uniform format.
+     */
     public static String getCurrentTime(){
         Calendar now = Calendar.getInstance();
         int year = now.get(Calendar.YEAR);
@@ -36,9 +43,12 @@ public class utils {
         return String.format("%d/%02d/%02d-%02d:%02d:%02d", year, month, day, hour, minute, second);
     }
 
+    /**
+     * These functions are used to transform data from json to Map. If the data is JSONObject, the
+     * toMap will be used. If the data is JSONArray, the toList will be used.
+     */
     public static Map<String, Object> jsonToMap(JSONObject json) throws JSONException {
         Map<String, Object> retMap = new HashMap<String, Object>();
-
         if(json != JSONObject.NULL) {
             retMap = toMap(json);
         }
@@ -47,7 +57,6 @@ public class utils {
 
     public static Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<String, Object>();
-
         Iterator<String> keysItr = object.keys();
         while(keysItr.hasNext()) {
             String key = keysItr.next();
@@ -56,7 +65,6 @@ public class utils {
             if(value instanceof JSONArray) {
                 value = toList((JSONArray) value);
             }
-
             else if(value instanceof JSONObject) {
                 value = toMap((JSONObject) value);
             }

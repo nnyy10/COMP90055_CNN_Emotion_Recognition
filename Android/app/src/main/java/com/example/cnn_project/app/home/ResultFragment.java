@@ -27,8 +27,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ResultFragment extends Fragment {
+/**
+ * This is the result page. When users click the "click" button in the history page, the page will go
+ * from history page to result page. It shows the processed image on the top and detailed results.
+ * Detailed results are defined in FaceViewAdapter.
+ */
 
+public class ResultFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private Context mContext;
@@ -46,7 +51,6 @@ public class ResultFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_result, container, false);
         getActivity().setTitle("Result");
 
@@ -56,11 +60,8 @@ public class ResultFragment extends Fragment {
 
         Picasso.get().load(imageLocation).into(imageView_response_image);
 
-
         ArrayList faceList = new ArrayList();
         for(DataSnapshot faceSnapshot: facesSnapshot){
-
-
             ArrayList<JSONObject> emotions = new ArrayList<>();
             for (int i = 0; i < 7; i++) {
                 try {
@@ -70,8 +71,6 @@ public class ResultFragment extends Fragment {
                     emotions.add(emotion);
                 } catch (JSONException e) { e.printStackTrace(); }
             }
-
-
             Face faceObject = new Face(faceSnapshot.child("image_location").getValue().toString(), emotions);
             faceList.add(faceObject);
         }
@@ -89,6 +88,11 @@ public class ResultFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
+
+    /**
+     * There is a "back" button in the menu. When clicking it, the page will go from the result
+     * page to the history page.
+     */
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -109,5 +113,4 @@ public class ResultFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

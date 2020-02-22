@@ -1,5 +1,9 @@
 package com.example.cnn_project.object;
 
+/**
+ * This function is used to define the data types, which are stored to database.
+ */
+
 public class DatabaseEntry {
     public String image_name;
     public String submit_time;
