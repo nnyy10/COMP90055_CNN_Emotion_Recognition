@@ -21,6 +21,7 @@ from keras.utils import multi_gpu_model
 
 class YOLO(object):
     _defaults = {
+        #predict config.
         "model_path": 'logs/one_train_weights.h5',
         "anchors_path": 'model_data/yolo_anchors.txt',
         "classes_path": 'model_data/emotion_classes.txt',
@@ -131,25 +132,30 @@ class YOLO(object):
         print("box list", out_boxes)
         print("score", out_scores)
         print("class list:", list(reversed(list(enumerate(out_classes)))))
-        # remove the almost same boxes (when iou >0.7) with lower score.
-        remove_index = []
-        for i,box in enumerate(out_boxes):
-            top1, left1, bottom1, right1 = out_boxes[i]
-            rec1 = (top1, left1, bottom1, right1)
-            if i == out_boxes.shape[0]-1:
-                break
-            else:
-                for j in range(i+1,out_boxes.shape[0]):
-                    top2, left2, bottom2, right2 = out_boxes[j]
-                    rec2 = (top2,left2,bottom2,right2)
-                    if compute_iou(rec1,rec2)>0.7:
-                        if out_scores[i]>out_scores[j]:
-                            remove_index.append(j)
-                        else: remove_index.append(i)
-        remove_index = list(set(remove_index))
-        out_scores = np.delete(out_scores,remove_index)
-        out_boxes = np.delete(out_boxes,remove_index,axis=0)
-        out_classes = np.delete(out_classes, remove_index,axis=0)
+        """
+        These can remove overlap boudinbg box of predictions having low score when IOU > 0.6 between them.
+        Only remains the box with highest score.
+        If dealing with mutilabel dataset, doesnt need this.
+        """
+        # remove_index = []
+        # for i, box in enumerate(out_boxes):
+        #     top1, left1, bottom1, right1 = out_boxes[i]
+        #     rec1 = (top1, left1, bottom1, right1)
+        #     if i == out_boxes.shape[0] - 1:
+        #         break
+        #     else:
+        #         for j in range(i + 1, out_boxes.shape[0]):
+        #             top2, left2, bottom2, right2 = out_boxes[j]
+        #             rec2 = (top2, left2, bottom2, right2)
+        #             if compute_iou(rec1, rec2) > 0.6:
+        #                 if out_scores[i] > out_scores[j]:
+        #                     remove_index.append(j)
+        #                 else:
+        #                     remove_index.append(i)
+        # remove_index = list(set(remove_index))
+        # out_scores = np.delete(out_scores, remove_index)
+        # out_boxes = np.delete(out_boxes, remove_index, axis=0)
+        # out_classes = np.delete(out_classes, remove_index, axis=0)
 
 
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
