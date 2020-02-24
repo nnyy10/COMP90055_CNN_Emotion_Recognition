@@ -119,11 +119,11 @@ If you want to use original pretrained weights for YOLOv3:
 
 7. For speeding up the training process with frozen layers train_bottleneck.py can be used. It will compute the bottleneck features of the frozen model first and then only trains the last layers. This makes training on CPU possible in a reasonable time. See [this](https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html) for more information on bottleneck features.
 ```diff
-- 8. image_process.py can read images from dataset csv file and randomly merge 1,2,4,9 pictures into one image. Like this:
-    
-    ![image](https://github.com/nnyy10/COMP90055_CNN_Emotion_Recognition/blob/master/keras-yolo3/imagefile/image_process.png)
-    
+- 8. image_process.py can read images from dataset csv file and randomly merge 1,2,4,9 pictures into one image. 
+- Like this:
+```    
+   ![image](https://github.com/nnyy10/COMP90055_CNN_Emotion_Recognition/blob/master/keras-yolo3/imagefile/image_process.png)
+```diff 
 - 9. Model can be evaluated using mAP. `--imgdir dir_path --txt` can make predictions .txt files for mAP
-
 -  Quick start:  `git clone https://github.com/Cartucho/mAP`
 ```
