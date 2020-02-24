@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+This module reads the image array in, uses MTCNN to crop the image, resize the cropped image back to 48x48 and saves it
+to a jpg and save it in data/processed_data/cropped_img.
+"""
+
 import csv
 import numpy as np
 from data_processing import crop_face_single

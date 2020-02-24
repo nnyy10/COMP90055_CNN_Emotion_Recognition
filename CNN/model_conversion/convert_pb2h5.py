@@ -1,9 +1,8 @@
-# import tensorflow as tf
-#
-# with tf.Session() as sess:
-#     saver = tf.train.import_meta_graph('model\\tf\\20180402-114759\\model-20180402-114759.meta')
-#     saver.restore(sess, 'model\\tf\\20180402-114759\\model-20180402-114759.ckpt-275')
-#
+# -*- coding: utf-8 -*-
+"""
+Script taken from https://github.com/nyoki-mtl/keras-facenet to convert model trained by
+David Sandberg (https://github.com/davidsandberg/facenet) from tensorflow 1 to tensorflow 2.
+"""
 
 import os
 import re

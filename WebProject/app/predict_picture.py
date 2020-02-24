@@ -1,78 +1,82 @@
-from utils import *
-import cv2
-import tensorflow as tf
-from keras.backend import set_session
-from face_detection import *
-import keras
-from utils import get_predicted_emotion, get_predicted_emotion_dictionary
-from data_processing import process_face
-import numpy as np
-import codecs, json
+# -*- coding: utf-8 -*-
+"""
+This module contains the prediction script for inception resnet and mobilenetv2.
 
-global graph, model, sess
+There are 3 functions: predict, predict_upload and predict_img_only.
+
+predict: Used by predict_api in main.py. It returns a json object with bounding boxes drawn on the received image as
+well as all the faces and the predicted emotions.
+
+predict_upload: Used by the predict_upload_api in main.py. It also return a json object with bounding boxes drawn on
+the received image as well as all the faces and the predicted emotions. Additionally, it returns 3 more things
+which is required to upload to the database.
+
+predict_img_only: Used by the predict_img_only_api in main.py It only returns a json object with bound boxes drawn on
+the received image and nothing else. For our website, this is used by the "camera" page after the user has signed in.
+"""
+
+import tensorflow as tf
+import utils
+from face_detection import detect_faces
+import keras
+import numpy as np
+from keras.backend import set_session
+
+global graph, inception_resnet_model, mobilenetv2_model, sess
 sess = tf.Session()
 graph = tf.get_default_graph()
 set_session(sess)
-model = keras.models.load_model("model/final_inception_resnet.h5", compile=False)
+inception_resnet_model = keras.models.load_model("model/final_inception_resnet.h5", compile=False)
+mobilenetv2_model = keras.models.load_model("model/final_mobilenetv2.h5", compile=False)
 
 
-def predict(image, img_only=False):
+def predict(image, model_to_use="inception-resnet"):
+
+    """some image passed in may be in 2d for some weird reason, the following code expands it to 3d"""
+    if image.ndim == 2:
+        image = np.stack((image,) * 3, axis=-1)
     faces = detect_faces(image)
 
     if len(faces) == 0:
         print("no face detected in image")
-        if img_only:
-            return None
-        else:
-            return None, None
+        return {"found": False}
 
     print('processing faces...')
-    processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]
-
-    if not img_only:
-        cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
+    if model_to_use == "mobilenetv2":
+        size = (48, 48)
+    else:
+        size = (160, 160)
+    processed_faces_pair = [utils.process_face(image, face, size=size) for face in faces]
+    cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
     processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)
 
     print('making predictions...')
-    global graph, model, sess
+    global graph, inception_resnet_model, mobilenetv2_model, sess
     with graph.as_default():
         set_session(sess)
-        predictions = model.predict(processed_faces)
+        if model_to_use == "mobilenetv2":
+            predictions = mobilenetv2_model.predict(processed_faces)
+        else:
+            predictions = inception_resnet_model.predict(processed_faces)
 
-    print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
-    face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
+    face_emotion_prediction_dictionary = [utils.get_predicted_emotion_dictionary(prediction) for prediction in predictions]
 
-    if not img_only:
-        result = []
-        for i in range(len(face_emotion_prediction_dictionary)):
-            result.append({"face": rgbToString(cropped_face[i])[0], "prediction": face_emotion_prediction_dictionary[i]})
+    result = []
+    for i in range(len(face_emotion_prediction_dictionary)):
+        face_buffer = utils.rgb_to_buffer(cropped_face[i])
+        face_base64_string = utils.buffer_to_base64_string(face_buffer)
+        face_json = {"face": face_base64_string, "prediction": face_emotion_prediction_dictionary[i]}
+        result.append(face_json)
 
-    boxed_image = image
-    for i, face in enumerate(faces):
-        x, y, w, h = getxywh(face)
-        boxed_image = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 165, 255), 2)
-        face_emotion = face_emotion_prediction_dictionary[i][0]
+    boxed_image = utils.draw_bounding_boxes(image, faces, face_emotion_prediction_dictionary)
 
-        font_scale = 0.9
-        font = cv2.FONT_HERSHEY_PLAIN
-        # set the rectangle background to white
-        rectangle_bgr = (255, 255, 255)
-        text = str(i+1) + ". " + face_emotion["emotion"] + ": " + face_emotion["probability"]
-        # get the width and height of the text box
-        (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
-        text_offset_x = x
-        text_offset_y = y - 1
-        box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + 2, text_offset_y - text_height - 2))
-        cv2.rectangle(image, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
-        cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
+    boxed_image_buffer = utils.rgb_to_buffer(boxed_image)
+    boxed_image_base64_string = utils.buffer_to_base64_string(boxed_image_buffer)
 
-    if img_only:
-        return rgbToString(boxed_image)
-    else:
-        return rgbToString(boxed_image), result
+    return {"image": boxed_image_base64_string, "found": True, "faces": result}
 
 
-def predict_upload(image):
+def predict_upload(image, model_to_use="inception-resnet"):
     faces = detect_faces(image)
 
     if len(faces) == 0:
@@ -80,43 +84,61 @@ def predict_upload(image):
         return None, None, None, None
 
     print('processing faces...')
-    processed_faces_pair = [process_face(image, face, size=(160, 160)) for face in faces]
+    if model_to_use == "mobilenetv2":
+        size = (48, 48)
+    else:
+        size = (160, 160)
+    processed_faces_pair = [utils.process_face(image, face, size=size) for face in faces]
 
     cropped_face = np.array([pair[0] for pair in processed_faces_pair], dtype=object)
     processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)
 
     print('making predictions...')
-    global graph, model, sess
+    global graph, inception_resnet_model, mobilenetv2_model, sess
     with graph.as_default():
         set_session(sess)
-        predictions = model.predict(processed_faces)
+        if model_to_use == "mobilenetv2":
+            predictions = mobilenetv2_model.predict(processed_faces)
+        else:
+            predictions = inception_resnet_model.predict(processed_faces)
 
-    print('the predicted emotion is: ', get_predicted_emotion(predictions[0]))
-    face_emotion_prediction_dictionary = [get_predicted_emotion_dictionary(prediction) for prediction in predictions]
+    face_emotion_prediction_dictionary = [utils.get_predicted_emotion_dictionary(prediction) for prediction in predictions]
 
     result = []
     for i in range(len(face_emotion_prediction_dictionary)):
-        result.append({"face": rgbToString(cropped_face[i])[0], "prediction": face_emotion_prediction_dictionary[i]})
+        face_buffer = utils.rgb_to_buffer(cropped_face[i])
+        face_base64_string = utils.buffer_to_base64_string(face_buffer)
+        result.append({"face": face_base64_string, "prediction": face_emotion_prediction_dictionary[i]})
 
-    cropped_face_buff = [rgbToString(face)[1] for face in cropped_face]
+    cropped_face_buff = [utils.rgb_to_buffer(face) for face in cropped_face]
 
-    boxed_image = image
-    for i, face in enumerate(faces):
-        x, y, w, h = getxywh(face)
-        boxed_image = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 165, 255), 2)
-        face_emotion = face_emotion_prediction_dictionary[i][0]
+    boxed_image = utils.draw_bounding_boxes(image, faces, face_emotion_prediction_dictionary)
+    boxed_image_buffer = utils.rgb_to_buffer(boxed_image)
+    boxed_image_base64_string = utils.buffer_to_base64_string(boxed_image_buffer)
 
-        font_scale = 0.9
-        font = cv2.FONT_HERSHEY_PLAIN
-        # set the rectangle background to white
-        rectangle_bgr = (255, 255, 255)
-        text = str(i+1) + ". " + face_emotion["emotion"] + ": " + face_emotion["probability"]
-        # get the width and height of the text box
-        (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
-        text_offset_x = x
-        text_offset_y = y - 1
-        box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + 2, text_offset_y - text_height - 2))
-        cv2.rectangle(image, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED)
-        cv2.putText(image, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=(0, 165, 255), thickness=1)
+    message = {"image": boxed_image_base64_string, "found": True, "faces": result}
 
-    return rgbToString(boxed_image), result, face_emotion_prediction_dictionary, cropped_face_buff
+    return message, face_emotion_prediction_dictionary, boxed_image_buffer, cropped_face_buff
+
+
+def predict_img_only(image):
+    faces = detect_faces(image)
+
+    if len(faces) == 0:
+        return {"found": False}
+
+    processed_faces_pair = [utils.process_face(image, face, size=(160, 160)) for face in faces]
+    processed_faces = np.array([pair[1] for pair in processed_faces_pair], dtype=object)
+
+    global graph, inception_resnet_model, sess
+    with graph.as_default():
+        set_session(sess)
+        predictions = inception_resnet_model.predict(processed_faces)
+
+    face_emotion_prediction_dictionary = [utils.get_predicted_emotion_dictionary(prediction) for prediction in predictions]
+    boxed_image = utils.draw_bounding_boxes(image, faces, face_emotion_prediction_dictionary)
+    boxed_image_buffer = utils.rgb_to_buffer(boxed_image)
+    boxed_image_base64_string = utils.buffer_to_base64_string(boxed_image_buffer)
+
+    return {"image": boxed_image_base64_string, "found": True}
+

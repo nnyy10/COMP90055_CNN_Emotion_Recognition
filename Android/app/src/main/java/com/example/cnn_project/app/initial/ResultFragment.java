@@ -38,8 +38,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ResultFragment extends Fragment {
+/**
+ * This is the result page. When users successfully upload an image and there is a detected face
+ * image, the page will go from upload page to result page.  It shows the processed image on the
+ * top and detailed results. Detailed results are defined in FacesViewAdapter.
+ */
 
+public class ResultFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private Context mContext;
@@ -48,24 +53,28 @@ public class ResultFragment extends Fragment {
     private ImageView imageView_response_image;
 
     private FirebaseAuth mAuth;
-
     private ProgressDialog progressDialog;
+    private String modelToUse;
 
-    public ResultFragment(JSONObject response, String imgName, Context mContext) {
+    public ResultFragment(JSONObject response, String imgName, Context mContext, String modelToUse) {
         this.mContext = mContext;
         this.response = response;
         this.imgName = imgName;
+        this.modelToUse = modelToUse;
     }
 
+    /**
+     * If there is an account in login state, the detected results will be uploaded to realtime
+     * database of the firebase. Otherwise, will not.
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_response, container, false);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (currentUser != null) {
+        if (currentUser != null && !modelToUse.equals("yolo3")) {
             progressDialog = ProgressDialog.show(getActivity(), "","Please wait while the result is being uploaded to database...", true);
             uploadToFirebase(this.response, currentUser);
         }
@@ -93,7 +102,6 @@ public class ResultFragment extends Fragment {
                 faceArrayList.add(jsonFace);
             }
 
-
             FacesViewAdapter adapter = new FacesViewAdapter(getActivity(), faceArrayList);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -101,10 +109,13 @@ public class ResultFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return view;
     }
 
+    /**
+     * This is the function to upload the related data to firebase. The processed images are stored
+     * to storage, while the other results are stored to realtime database.
+     */
     @SuppressLint("StaticFieldLeak")
     private void uploadToFirebase(final JSONObject response, final FirebaseUser currentUser) {
         new AsyncTask<Void, Void, Void>() {

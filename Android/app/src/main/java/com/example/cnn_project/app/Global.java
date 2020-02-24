@@ -1,5 +1,9 @@
 package com.example.cnn_project.app;
 
+/**
+ * This is used to defined some global variables.
+ */
+
 public class Global {
 
     public static String API_NAME = "predict_api";

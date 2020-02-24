@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Data processing helper functions
+"""
+
 import cv2
 import numpy as np
 from face_detection import getxywh

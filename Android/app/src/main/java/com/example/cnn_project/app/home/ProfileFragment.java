@@ -19,6 +19,11 @@ import com.example.cnn_project.app.authentication.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * This is ProfileFragment, which has the account information. Also there is a log out button for
+ * users logging out.
+ */
+
 public class ProfileFragment extends Fragment {
 
     private TextView email_profile;
@@ -36,14 +41,11 @@ public class ProfileFragment extends Fragment {
         logout = view.findViewById(R.id.logout);
         logout.setOnClickListener(logoutListener);
 
-
         if (user != null) {
             String email = user.getEmail();
             String uid = user.getUid();
             email_profile.setText("Email: " + email);
         }
-
-
         return view;
     }
 

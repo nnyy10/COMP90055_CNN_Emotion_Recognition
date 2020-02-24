@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 Class definition of YOLO_v3 style detection model on image and video
 """
 
 import colorsys
-import os
 from timeit import default_timer as timer
-import cv2
-import codecs, json
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
-
 from yolo.yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo.yolo3.utils import letterbox_image
 import os
@@ -21,8 +16,7 @@ from keras.utils import multi_gpu_model
 global graph, model, sess
 from keras.backend import set_session
 import tensorflow as tf
-import keras
-from utils import stringToRGB, RGB_to_PIL_img, PIL_img_to_RGB, rgbToString
+import utils
 
 sess = tf.Session()
 graph = tf.get_default_graph()
@@ -34,8 +28,8 @@ class YOLO(object):
         "model_path": 'model/final_yolo3.h5',
         "anchors_path": 'yolo/yolo_anchors.txt',
         "classes_path": 'yolo/emotion_classes.txt',
-        "score" : 0.2,
-        "iou" : 0.7,
+        "score" : 0.3,
+        "iou" : 0.45,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
     }
@@ -117,6 +111,8 @@ class YOLO(object):
     def detect_image(self, image):
         start = timer()
 
+        old_image = image.copy()
+
         if self.model_image_size != (None, None):
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
             assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
@@ -164,6 +160,9 @@ class YOLO(object):
 
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
+        if len(out_boxes) == 0:
+            return {"found": False}
+
         font = ImageFont.truetype(font='yolo/font/FiraMono-Medium.otf',
                     size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300
@@ -207,7 +206,13 @@ class YOLO(object):
 
         end = timer()
         print("time:",end - start)
-        return image, len(out_boxes), prediction
+
+        output_rgb = utils.pil_to_rgb(image)
+        boxed_image = utils.rgb_to_buffer(output_rgb)
+        boxed_image = utils.buffer_to_base64_string(boxed_image)
+        results = predict_detail(old_image, prediction)
+        message = {"image": boxed_image, "found": True, "faces": results}
+        return message
 
 
 
@@ -337,9 +342,10 @@ def predict_detail(original_image,predictions):
         #(left,top,right,bottom)
         crop_region = prediction[2]
         crop_image = original_image.crop(crop_region)
-        output_rgb = PIL_img_to_RGB(crop_image)
-        boxed_image = rgbToString(output_rgb)
-        box_info = {"face":boxed_image[0],"prediction":[{"emotion":lable,"probability":str(round(score,2))}]}
+        output_rgb = utils.pil_to_rgb(crop_image)
+
+        boxed_image = utils.buffer_to_base64_string(utils.rgb_to_buffer(output_rgb))
+        box_info = {"face": boxed_image, "prediction": [{"emotion": lable, "probability": str(round(score, 2))}]}
         results.append(box_info)
     return results
 
