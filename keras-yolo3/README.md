@@ -24,13 +24,12 @@ Based on this, we add more fucntions like camera for experience and images proce
 wget https://pjreddie.com/media/files/yolov3.weights
 python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 python yolo_predict.py [OPTIONS...] --image, for image detection mode, OR
+python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
 ```
 ```diff
 - python yolo_predict.py [OPTIONS...] --camera, for camera detection mode, OR
 - python yolo_predict.py [OPTIONS...] --imgdir directory_path --txt, 
 - This outputs prediction result in .txt file for each image in directory, OR
-
-- python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
 ```
 
 For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
@@ -61,7 +60,6 @@ optional arguments:
 --imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
 ```
 ---
-
 4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
 ## Training
