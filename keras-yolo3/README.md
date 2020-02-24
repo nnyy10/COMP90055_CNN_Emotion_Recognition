@@ -7,8 +7,9 @@
 This keras-yolo3 is git cloned from: https://github.com/qqwweee/keras-yolo3
 
 Based on this, we add more fucntions like camera for experience and images processing and predict script.
-
-<font color="#dd0000">All added functions and scripts are marked with red color </font>
+```diff
+- All added functions and information are marked with red color.
+```
 
 
 ---
@@ -23,15 +24,13 @@ Based on this, we add more fucntions like camera for experience and images proce
 wget https://pjreddie.com/media/files/yolov3.weights
 python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 python yolo_predict.py [OPTIONS...] --image, for image detection mode, OR
+```
+```diff
+- python yolo_predict.py [OPTIONS...] --camera, for camera detection mode, OR
+- python yolo_predict.py [OPTIONS...] --imgdir directory_path --txt, 
+- This outputs prediction result in .txt file for each image in directory, OR
 
-python yolo_predict.py [OPTIONS...] --camera, for camera detection mode, OR
-
-python yolo_predict.py [OPTIONS...] --imgdir directory_path --txt, 
-This outputs prediction result in .txt file for each image in directory, OR
-
-python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
-
-
+- python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
 ```
 
 For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
@@ -55,9 +54,11 @@ optional arguments:
   --classes CLASSES  path to class definitions, default
                      model_data/coco_classes.txt
   --gpu_num GPU_NUM  Number of GPU to use, default 1
-  --image            Image detection mode, will ignore all positional arguments
-  --camera           Camera detection mode, will ignore all positional arguments
-  --imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
+```
+```diff
+--image            Image detection mode, will ignore all positional arguments
+--camera           Camera detection mode, will ignore all positional arguments
+--imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
 ```
 ---
 
@@ -99,11 +100,12 @@ If you want to use original pretrained weights for YOLOv3:
     - Python 3.5 or above
     - Keras 2.1.5
     - tensorflow 1.6.0
-    
-   For macOS environment:
-    - Python 3.5 or above
-    - tensorflow 1.15, tf2 cant run
-    - Keras 2.1.5
+```diff    
+- For macOS environment:
+- Python 3.5 or above
+- tensorflow 1.15, tf2 cant run
+- Keras 2.1.5
+```
 
 2. Default anchors are used. If you use your own anchors, probably some changes are needed.
 
@@ -116,12 +118,12 @@ If you want to use original pretrained weights for YOLOv3:
 6. The training strategy is for reference only. Adjust it according to your dataset and your goal. And add further strategy if needed.
 
 7. For speeding up the training process with frozen layers train_bottleneck.py can be used. It will compute the bottleneck features of the frozen model first and then only trains the last layers. This makes training on CPU possible in a reasonable time. See [this](https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html) for more information on bottleneck features.
-
-8. image_process.py can read images from dataset csv file and randomly merge 1,2,4,9 pictures into one image.
-    Like this:
+```diff
+- 8. image_process.py can read images from dataset csv file and randomly merge 1,2,4,9 pictures into one image. Like this:
     
     ![image](https://github.com/nnyy10/COMP90055_CNN_Emotion_Recognition/blob/master/keras-yolo3/imagefile/image_process.png)
     
-9. Model can be evaluated using mAP. `--imgdir dir_path --txt` can make predictions .txt files for mAP
+- 9. Model can be evaluated using mAP. `--imgdir dir_path --txt` can make predictions .txt files for mAP
 
-   Quick start:  `git clone https://github.com/Cartucho/mAP`
+-  Quick start:  `git clone https://github.com/Cartucho/mAP`
+```
