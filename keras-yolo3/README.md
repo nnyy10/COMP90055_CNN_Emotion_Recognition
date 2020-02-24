@@ -20,13 +20,11 @@ Based on this, we add more fucntions like camera for experience and images proce
 2. Convert the Darknet YOLO model to a Keras model.
 3. Run YOLO detection.
 
-```
+```diff
 wget https://pjreddie.com/media/files/yolov3.weights
 python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 python yolo_predict.py [OPTIONS...] --image, for image detection mode, OR
 python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
-```
-```diff
 - python yolo_predict.py [OPTIONS...] --camera, for camera detection mode, OR
 - python yolo_predict.py [OPTIONS...] --imgdir directory_path --txt, 
 - This outputs prediction result in .txt file for each image in directory, OR
@@ -36,11 +34,11 @@ For Tiny YOLOv3, just do in a similar way, just specify model path and anchor pa
 
 ### Usage
 Use --help to see usage of yolo_predict.py:
-```
+```diff
 usage: yolo_predict.py [-h] [--model MODEL] [--anchors ANCHORS]
-                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image] [--camera] [--imgdir]
+                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image]
                      [--input] [--output]
-
+-                    [--camera] [--imgdir]
 positional arguments:
   --input        Video input path
   --output       Video output path
@@ -53,9 +51,7 @@ optional arguments:
   --classes CLASSES  path to class definitions, default
                      model_data/coco_classes.txt
   --gpu_num GPU_NUM  Number of GPU to use, default 1
-```
-```diff
---image            Image detection mode, will ignore all positional arguments
+  --image            Image detection mode, will ignore all positional arguments
 --camera           Camera detection mode, will ignore all positional arguments
 --imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
 ```
