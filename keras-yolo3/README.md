@@ -21,10 +21,10 @@ Based on this, we add more fucntions like camera for experience and images proce
 3. Run YOLO detection.
 
 ```diff
-wget https://pjreddie.com/media/files/yolov3.weights
-python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
-python yolo_predict.py [OPTIONS...] --image, for image detection mode, OR
-python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
+  wget https://pjreddie.com/media/files/yolov3.weights
+  python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
+  python yolo_predict.py [OPTIONS...] --image, for image detection mode, OR
+  python yolo_predict.py [video_path] [output_path (optional)], for video detection mode
 - python yolo_predict.py [OPTIONS...] --camera, for camera detection mode, OR
 - python yolo_predict.py [OPTIONS...] --imgdir directory_path --txt, 
 - This outputs prediction result in .txt file for each image in directory, OR
@@ -52,8 +52,8 @@ optional arguments:
                      model_data/coco_classes.txt
   --gpu_num GPU_NUM  Number of GPU to use, default 1
   --image            Image detection mode, will ignore all positional arguments
---camera           Camera detection mode, will ignore all positional arguments
---imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
+- --camera           Camera detection mode, will ignore all positional arguments
+- --imgdir           Predcit all images in one directory. Help evaluate the model using mAP.
 ```
 ---
 4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
