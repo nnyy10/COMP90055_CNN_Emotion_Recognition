@@ -8,6 +8,8 @@ This keras-yolo3 is git cloned from: https://github.com/qqwweee/keras-yolo3
 
 Based on this, we add more fucntions like camera for experience and images processing and predict script.
 
+<font color="#dd0000">All added functions and scripts are marked with red color </font>
+
 
 ---
 
